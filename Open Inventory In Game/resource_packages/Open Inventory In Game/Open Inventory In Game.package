@@ -1,0 +1,11 @@
+mod = [
+	"Open Inventory In Game"
+]
+
+package = [
+	"resource_packages/Open Inventory In Game/Open Inventory In Game"
+]
+
+lua = [
+	"scripts/mods/Open Inventory In Game/*"
+]

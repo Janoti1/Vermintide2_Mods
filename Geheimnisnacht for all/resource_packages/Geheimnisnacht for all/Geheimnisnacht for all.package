@@ -1,0 +1,11 @@
+mod = [
+	"Geheimnisnacht for all"
+]
+
+package = [
+	"resource_packages/Geheimnisnacht for all/Geheimnisnacht for all"
+]
+
+lua = [
+	"scripts/mods/Geheimnisnacht for all/*"
+]

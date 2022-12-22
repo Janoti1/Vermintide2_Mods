@@ -236,43 +236,67 @@ mod:add_text("hekartis_cruel_bargain_desc", "For each Elite enemy slain near Ker
 mod.check_old_radiant = function ()
 	if mod.settings.enable_old_radiant then
 		
-        mod:set_talent("we_thornsister", 4, 3, "kerillian_thorn_radiants", {
-            num_ranks = 1,
-            buffer = "both",
-            icon = "kerillian_thornsister_avatar",
-            buffs = {
-                "kerillian_thorn_old_radiant"
-            }
-        })
-        mod:add_talent_text("kerillian_thorn_radiants", "Radiant Inheritance", "Consuming Radiance grants Kerillian vastly increased combat potency for 15 seconds.")
+        mod:add_text("kerillian_thorn_radiants_desc", "Consuming Radiance grants Kerillian vastly increased combat potency for 15 seconds.")
         
 	else
 	
-        mod:set_talent("we_thornsister", 4, 3, "kerillian_thorn_radiants", {
-            num_ranks = 1,
-            buffer = "both",
-            icon = "kerillian_thornsister_avatar",
-            buffs = {
-                "kerillian_thorn_radiant"
-            }
-        })
-        mod:add_talent_text("kerillian_thorn_radiants", "Radiant Inheritance", "Consuming Radiance grants Kerillian 20%% extra attack speed, move speed, power and crit power for 10 seconds.")
+        mod:add_text("kerillian_thorn_radiants_desc", "Consuming Radiance grants Kerillian 20%% extra attack speed, move speed, power and crit power for 10 seconds.")
         
 	end
 end
 
+--Change Talent 
+mod:add_text("kerillian_thorn_radiants_name", "Radiant Inheritance")
+mod:modify_talent("we_thornsister", 4, 3, {
+	num_ranks = 1,
+	name = "kerillian_thorn_radiants_name",
+	description = "kerillian_thorn_radiants_desc",
+	buffer = "client",
+	icon = "kerillian_thornsister_avatar",
+	buffs = {
+		"kerillian_thorn_radiant"
+	}
+})
 
--- Post First Nerf Radiant (Pre Rework)
+-- Buff Talent (change buff_func)
 mod:add_talent_buff_template("wood_elf", "kerillian_thorn_radiant", {
     {
 		name = "kerillian_thorn_radiant",
         event_buff = true,
-		buff_func = "add_buff",
+		buff_func = "add_buff_sister",
 		event = "on_extra_ability_consumed",
-		buff_to_add = "kerillian_thorn_active_radiant_1_cs"
 	}
 })
 
+--Buff talent function
+ProcFunctions.add_buff_sister = function (player, buff, params)
+	local player_unit = player.player_unit
+
+	if ALIVE[player_unit] then
+		local buff_name = nil
+		if mod.settings.enable_old_radiant then
+			buff_name = "kerillian_thorn_active_old_radiant_1_cs"
+		else
+			buff_name = "kerillian_thorn_active_radiant_1_c"
+		end
+		local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
+		local network_manager = Managers.state.network
+		local network_transmit = network_manager.network_transmit
+		local unit_object_id = network_manager:unit_game_object_id(player_unit)
+		local buff_template_name_id = NetworkLookup.buff_templates[buff_name]
+
+		if Managers.player.is_server then
+			buff_extension:add_buff(buff_name, {
+				attacker_unit = player_unit
+			})
+			network_transmit:send_rpc_clients("rpc_add_buff", unit_object_id, buff_template_name_id, unit_object_id, 0, false)
+		else
+			network_transmit:send_rpc_server("rpc_add_buff", unit_object_id, buff_template_name_id, unit_object_id, 0, true)
+		end
+	end
+end
+
+-- Post First Nerf Radiant (Pre Rework)
 BuffTemplates.kerillian_thorn_active_radiant_1_cs = {
     activation_effect = "fx/thornsister_avatar_screenspace",
     deactivation_sound = "stop_career_ability_kerilian_power_loop",
@@ -338,30 +362,8 @@ local index = #NetworkLookup.buff_templates + 1
 NetworkLookup.buff_templates[index] = "kerillian_thorn_active_radiant_1_cs"
 NetworkLookup.buff_templates["kerillian_thorn_active_radiant_1_cs"] = index
 
-local index = #NetworkLookup.buff_templates + 1
-NetworkLookup.buff_templates[index] = "kerillian_thorn_active_radiant_2_cs"
-NetworkLookup.buff_templates["kerillian_thorn_active_radiant_2_cs"] = index
-
-local index = #NetworkLookup.buff_templates + 1
-NetworkLookup.buff_templates[index] = "kerillian_thorn_active_radiant_3_cs"
-NetworkLookup.buff_templates["kerillian_thorn_active_radiant_3_cs"] = index
-
-local index = #NetworkLookup.buff_templates + 1
-NetworkLookup.buff_templates[index] = "kerillian_thorn_active_radiant_4_cs"
-NetworkLookup.buff_templates["kerillian_thorn_active_radiant_4_cs"] = index
-
 
 -- Release Radiant
-mod:add_talent_buff_template("wood_elf", "kerillian_thorn_old_radiant", {
-		{
-			name = "kerillian_thorn_old_radiant",
-			event_buff = true,
-			buff_func = "add_buff",
-			event = "on_extra_ability_consumed",
-			buff_to_add = "kerillian_thorn_active_old_radiant_1_cs"
-		}
-})
-
 BuffTemplates.kerillian_thorn_active_old_radiant_1_cs = {
 		activation_effect = "fx/thornsister_avatar_screenspace",
 		deactivation_sound = "stop_career_ability_kerilian_power_loop",
@@ -436,22 +438,6 @@ BuffTemplates.kerillian_thorn_active_old_radiant_1_cs = {
 local index = #NetworkLookup.buff_templates + 1
 NetworkLookup.buff_templates[index] = "kerillian_thorn_active_old_radiant_1_cs"
 NetworkLookup.buff_templates["kerillian_thorn_active_old_radiant_1_cs"] = index
-
-local index = #NetworkLookup.buff_templates + 1
-NetworkLookup.buff_templates[index] = "kerillian_thorn_active_old_radiant_2_cs"
-NetworkLookup.buff_templates["kerillian_thorn_active_old_radiant_2_cs"] = index
-
-local index = #NetworkLookup.buff_templates + 1
-NetworkLookup.buff_templates[index] = "kerillian_thorn_active_old_radiant_3_cs"
-NetworkLookup.buff_templates["kerillian_thorn_active_old_radiant_3_cs"] = index
-
-local index = #NetworkLookup.buff_templates + 1
-NetworkLookup.buff_templates[index] = "kerillian_thorn_active_old_radiant_4_cs"
-NetworkLookup.buff_templates["kerillian_thorn_active_old_radiant_4_cs"] = index
-
-local index = #NetworkLookup.buff_templates + 1
-NetworkLookup.buff_templates[index] = "kerillian_thorn_active_old_radiant_5_cs"
-NetworkLookup.buff_templates["kerillian_thorn_active_old_radiant_5_cs"] = index
 
 
 

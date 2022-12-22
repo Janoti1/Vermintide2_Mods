@@ -434,7 +434,6 @@ BuffTemplates.kerillian_thorn_active_old_radiant_1_cs = {
 		}
 }
 
---TODO sync buff template index between client and server? Could be an issue when client and server are out of sync.
 local index = #NetworkLookup.buff_templates + 1
 NetworkLookup.buff_templates[index] = "kerillian_thorn_active_old_radiant_1_cs"
 NetworkLookup.buff_templates["kerillian_thorn_active_old_radiant_1_cs"] = index

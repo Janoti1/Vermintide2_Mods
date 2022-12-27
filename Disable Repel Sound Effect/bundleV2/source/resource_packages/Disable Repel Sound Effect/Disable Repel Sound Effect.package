@@ -1,0 +1,11 @@
+mod = [
+	"Disable Repel Sound Effect"
+]
+
+package = [
+	"resource_packages/Disable Repel Sound Effect/Disable Repel Sound Effect"
+]
+
+lua = [
+	"scripts/mods/Disable Repel Sound Effect/*"
+]

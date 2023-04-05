@@ -16,9 +16,9 @@ local WALL_SHAPES = table.enum("linear", "radial")
 local UNIT_NAMES = {
 	default = "units/beings/player/way_watcher_thornsister/abilities/ww_thornsister_thorn_wall_01",
 	bleed = "units/beings/player/way_watcher_thornsister/abilities/ww_thornsister_thorn_wall_01_bleed",
-	poison = "units/beings/player/way_watcher_thornsister/abilities/ww_thornsister_thorn_wall_01_poison"
+	-- poison = "units/beings/player/way_watcher_thornsister/abilities/ww_thornsister_thorn_wall_01_poison" -- Removed from the game with 4.9
 }
-local WALL_TYPES = table.enum("default", "bleed", "poison")
+local WALL_TYPES = table.enum("default", "bleed")
 --local buff_tweak_data = {kerillian_thorn_sister_tanky_wall = {visualizer_extra_duration = 10}}
 
 ActionCareerWEThornsisterTargetWall.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level, action_init_data)
@@ -328,7 +328,7 @@ SpawnUnitTemplates.thornsister_thorn_wall_unit = {
 				props_params.life_time = props_params.life_time * life_time_mult + life_time_bonus
 				UNIT_NAME = UNIT_NAMES[WALL_TYPES.bleed]
 			elseif source_talent_extension:has_talent("blackvenom_thicket_name") then
-				UNIT_NAME = UNIT_NAMES[WALL_TYPES.poison]
+				UNIT_NAME = UNIT_NAMES[WALL_TYPES.default]
 			end
 		end
 

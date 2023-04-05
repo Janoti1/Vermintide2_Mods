@@ -18,7 +18,7 @@ return {
 		en = "Disable Repel's sound effect"
 	},
 	classic_sister_disable_repel_sound_tooltip = {
-		en = "Disable Repel's sound effect.\n(restart required to enable the sound effect again)"
+		en = "Disable Repel's sound effect."
 	}
 }
 

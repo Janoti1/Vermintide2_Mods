@@ -57,16 +57,16 @@ mod:add_talent_buff_template("wood_elf", "kerillian_thorn_sister_big_bleed_class
         proc_weight = 10,
     }
 })
-ProcFunctions.thorn_sister_add_bleed_on_hit_classic_sister = function (player, buff, params)
-    local player_unit = player.player_unit
+ProcFunctions.thorn_sister_add_bleed_on_hit_classic_sister = function (owner_unit, buff, params)
+    --local player_unit = player.player_unit
     local hit_unit = params[1]
     local is_crit = params[6]
    
-    if ALIVE[player_unit] and ALIVE[hit_unit] and is_crit then -- not is crit
+    if ALIVE[owner_unit] and ALIVE[hit_unit] and is_crit then -- not is crit
         local template = buff.template
         local bleed = template.bleed
         local buff_system = Managers.state.entity:system("buff_system")
-        local career_extension = ScriptUnit.extension(player_unit, "career_system")
+        local career_extension = ScriptUnit.extension(owner_unit, "career_system")
         local power_level = career_extension:get_career_power_level()
         local target_buff_extension = ScriptUnit.has_extension(hit_unit, "buff_system")
 
@@ -76,7 +76,7 @@ ProcFunctions.thorn_sister_add_bleed_on_hit_classic_sister = function (player, b
 
         local buff_params = {
             power_level = power_level,
-            attacker_unit = player_unit
+            attacker_unit = owner_unit
         }
 
         buff_system:add_buff_synced(hit_unit, bleed, BuffSyncType.LocalAndServer, buff_params)
@@ -139,11 +139,11 @@ BuffTemplates.kerillian_power_on_health_gain_buff = {
             refresh_durations = true,     
         }
 }}
-ProcFunctions.add_buff_on_proc_thorn = function (player, buff, params)
-    local player_unit = player.player_unit
+ProcFunctions.add_buff_on_proc_thorn = function (owner_unit, buff, params)
+    --local player_unit = player.player_unit
 
-    if ALIVE[player_unit] then
-        local buff_extension = ScriptUnit.extension(player_unit, "buff_system") --HT
+    if ALIVE[owner_unit] then
+        local buff_extension = ScriptUnit.extension(owner_unit, "buff_system") --HT
         local template = buff.template --HT
         local buff_to_add = template.buff_to_add --HT
 		buff_extension:add_buff(buff_to_add) --HT
@@ -176,11 +176,11 @@ BuffTemplates.kerillian_thorn_sister_reduce_passive_on_elite = {
         }
     }
 }
-ProcFunctions.kerillian_thorn_sister_reduce_passive_on_elite_new = function (player, buff, params)
-    local player_unit = player.player_unit
+ProcFunctions.kerillian_thorn_sister_reduce_passive_on_elite_new = function (owner_unit, buff, params)
+    --local player_unit = player.player_unit
 
-    if ALIVE[player_unit] then
-        local career_extension = ScriptUnit.extension(player_unit, "career_system")
+    if ALIVE[owner_unit] then
+        local career_extension = ScriptUnit.extension(owner_unit, "career_system")
         local passive_ability = career_extension:get_passive_ability(1)
         local template = buff.template
         local time_to_remove = template.time_removed_per_kill or 0
@@ -269,25 +269,25 @@ mod:add_talent_buff_template("wood_elf", "kerillian_thorn_radiant", {
 })
 
 --Buff talent function
-ProcFunctions.add_buff_sister = function (player, buff, params)
-	local player_unit = player.player_unit
+ProcFunctions.add_buff_sister = function (owner_unit, buff, params)
+	--local player_unit = player.player_unit
 
-	if ALIVE[player_unit] then
+	if ALIVE[owner_unit] then
 		local buff_name = nil
 		if mod.settings.enable_old_radiant then
 			buff_name = "kerillian_thorn_active_old_radiant_1_cs"
 		else
-			buff_name = "kerillian_thorn_active_radiant_1_c"
+			buff_name = "kerillian_thorn_active_radiant_1_cs"
 		end
-		local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
+		local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
 		local network_manager = Managers.state.network
 		local network_transmit = network_manager.network_transmit
-		local unit_object_id = network_manager:unit_game_object_id(player_unit)
+		local unit_object_id = network_manager:unit_game_object_id(owner_unit)
 		local buff_template_name_id = NetworkLookup.buff_templates[buff_name]
 
 		if Managers.player.is_server then
 			buff_extension:add_buff(buff_name, {
-				attacker_unit = player_unit
+				attacker_unit = owner_unit
 			})
 			network_transmit:send_rpc_clients("rpc_add_buff", unit_object_id, buff_template_name_id, unit_object_id, 0, false)
 		else
@@ -455,14 +455,14 @@ mod:add_talent_buff_template("wood_elf", "kerillian_thorn_free_throw_heal_all_ha
     },
 })
 BuffFunctionTemplates.functions.kerillian_thorn_sister_free_throw_handler_update_new = function (owner_unit, buff, params)
-    local player_unit = owner_unit
+    --local player_unit = owner_unit
 
-    if ALIVE[player_unit] then
+    if ALIVE[owner_unit] then
         local template = buff.template
         local timer_buff_to_add = template.timer_buff
         local buff_to_add = template.buff_to_add
         local t = params.t
-        local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
+        local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
 
         if not buff.timer_buff then
             buff.timer_buff = buff_extension:get_non_stacking_buff(timer_buff_to_add)
@@ -482,7 +482,7 @@ BuffFunctionTemplates.functions.kerillian_thorn_sister_free_throw_handler_update
             if not has_buff and not buff.buffed then
                 local buff_system = Managers.state.entity:system("buff_system")
 
-                buff_system:add_buff(player_unit, buff_to_add, player_unit, false)
+                buff_system:add_buff(owner_unit, buff_to_add, owner_unit, false)
 
                 buff.buffed = true
             elseif not has_buff and buff.buffed then
@@ -514,16 +514,16 @@ mod:add_talent_buff_template("wood_elf", "kerillian_thorn_free_throw_buff", {
         amount_to_heal = 3,
     },
 })
-ProcFunctions.kerillian_thorn_sister_add_buff_remove_new = function (player, buff, params)
-    local player_unit = player.player_unit
+ProcFunctions.kerillian_thorn_sister_add_buff_remove_new = function (owner_unit, buff, params)
+    --local player_unit = player.player_unit
 
-    if ALIVE[player_unit] then
+    if ALIVE[owner_unit] then
         local buff_to_add = buff.template.buff_to_add
         local buff_system = Managers.state.entity:system("buff_system")
 
-        buff_system:add_buff(player_unit, buff_to_add, player_unit, false)
+        buff_system:add_buff(owner_unit, buff_to_add, owner_unit, false)
 
-        local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
+        local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
 
         buff_extension:remove_buff(buff.id)
     end
@@ -537,22 +537,22 @@ mod:add_talent_buff_template("wood_elf", "kerillian_thorn_free_heal_buff", {
         amount_to_heal = 3,
     },
 })
-ProcFunctions.kerillian_thorn_restore_health_on_ranged_hit = function (player, buff, params)
-    local player_unit = player.player_unit
+ProcFunctions.kerillian_thorn_restore_health_on_ranged_hit = function (owner_unit, buff, params)
+    --local player_unit = player.player_unit
     local attack_type = params[7]
 
-    if ALIVE[player_unit] and attack_type and (attack_type == "projectile" or attack_type == "instant_projectile") then
+    if ALIVE[owner_unit] and attack_type and (attack_type == "projectile" or attack_type == "instant_projectile") then
         if Managers.state.network.is_server then
-            local side = Managers.state.side.side_by_unit[player_unit]
+            local side = Managers.state.side.side_by_unit[owner_unit]
             local player_and_bot_units = side.PLAYER_AND_BOT_UNITS
             local amount_to_heal = buff.template.amount_to_heal
             
             for i = 1, #player_and_bot_units, 1 do
-                DamageUtils.heal_network(player_and_bot_units[i], player_unit, amount_to_heal, "career_passive")
+                DamageUtils.heal_network(player_and_bot_units[i], owner_unit, amount_to_heal, "career_passive")
             end     
         end
 
-        local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
+        local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
 
         buff_extension:remove_buff(buff.id)
     end
@@ -589,13 +589,13 @@ BuffTemplates.kerillian_thorn_sister_crit_on_any_ability_handler = {
         }
     }
 }
-ProcFunctions.remove_ref_buff_stack_woods = function (player, buff, params)
-    local player_unit = player.player_unit
+ProcFunctions.remove_ref_buff_stack_woods = function (owner_unit, buff, params)
+    --local player_unit = player.player_unit
 
-    if ALIVE[player_unit] then
+    if ALIVE[owner_unit] then
         local buff_template = buff.template
         local buff_name = buff_template.buff_to_remove
-        local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
+        local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
         local buffs = buff_extension:get_stacking_buff(buff_name)
 
         if buffs then
@@ -622,15 +622,15 @@ BuffTemplates.kerillian_thorn_sister_crit_on_any_ability = {
         }
     }
 }
-ProcFunctions.add_buff_reff_buff_stack = function (player, buff, params)
-    local player_unit = player.player_unit
+ProcFunctions.add_buff_reff_buff_stack = function (owner_unit, buff, params)
+    --local player_unit = player.player_unit
     --local triggering_unit = params[1] (4.6)
 
-    if ALIVE[player_unit] then -- and triggering_unit == player_unit (4.6)
+    if ALIVE[owner_unit] then -- and triggering_unit == player_unit (4.6)
         local template = buff.template
         local buff_name = template.buff_to_add
         local amount_to_add = template.amount_to_add
-        local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
+        local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
 
         for i = 1, amount_to_add, 1 do
             buff_extension:add_buff(buff_name)
@@ -664,32 +664,18 @@ mod:add_text("moraihegs_doomsight_desc", "Gain 3 guaranteed Critical Strikes eac
 
 
 
--- Repel (deactivate sound effect)
+-- Repel (deactivate sound effect) Credits to Isaakk for not needing to restart anymore
 mod.check_repel_sound = function ()
 
 	if mod.settings.disable_repel_sound then
 		
-		mod:add_talent_buff_template ("wood_elf", "kerillian_thorn_sister_big_push_buff", {
-			--activation_sound = "career_ability_kerilian_push",
-			buffs = {
-				{
-					stat_buff = "push_range",
-					buff_func = "thorn_sister_big_push"
-				}
-			}
-		})
+        BuffTemplates.kerillian_thorn_sister_big_push_buff.activation_sound  = nil
 	
 	else
 		
-		mod:modify_talent_buff_template ("wood_elf", "kerillian_thorn_sister_big_push_buff", {
-			activation_sound = "career_ability_kerilian_push",
-			buffs = {
-				{
-					stat_buff = "push_range",
-					buff_func = "thorn_sister_big_push"
-				}
-			}
-		})
+        BuffTemplates.kerillian_thorn_sister_big_push_buff.activation_sound  = "career_ability_kerilian_push"
 
 	end
 end
+
+

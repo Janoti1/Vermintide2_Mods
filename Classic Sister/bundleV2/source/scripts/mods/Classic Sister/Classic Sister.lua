@@ -277,10 +277,10 @@ local function updateValues()
 
 end
 mod.on_enabled = function (self)
-	mod:echo("Classic Sister v1.1.0 enabled")
+	mod:echo("Classic Sister v1.3.0 enabled")
 	updateValues()
 end
 
 -- TODO
 -- Client Timer for PQC
--- release Radiant doesnt work on client
+-- Sound of Bleed ult is wierd

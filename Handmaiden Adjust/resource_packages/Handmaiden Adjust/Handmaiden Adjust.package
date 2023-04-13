@@ -1,0 +1,11 @@
+mod = [
+	"Handmaiden Adjust"
+]
+
+package = [
+	"resource_packages/Handmaiden Adjust/Handmaiden Adjust"
+]
+
+lua = [
+	"scripts/mods/Handmaiden Adjust/*"
+]

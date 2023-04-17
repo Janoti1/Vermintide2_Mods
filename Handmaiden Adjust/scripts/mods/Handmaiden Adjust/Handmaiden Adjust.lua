@@ -305,11 +305,23 @@ mod:modify_talent_buff_template("wood_elf", "kerillian_maidenguard_passive_stami
 })
 
 
--- Ariel's Benison
+-- Ariel's Benison (Healing is gone, DR?)
 -- Change: Now instead of healing, revived allies receive 50% DR for 15 sec. 
 -- Original: Increase Kerillian's revive speed by 50%. When Kerillian revives allies, she heals them for 20 health.
 mod:modify_talent_buff_template("wood_elf", "kerillian_maidenguard_insta_ress", {
     {
+        stat_buff = "faster_revive",
+        buff_func = "buff_defence_on_revived_target",
+        event = "on_revived_ally",
+        refresh_durations = true,
+        buff_to_add = {
+            "defense_on_revived_target_handmaiden_adjust"
+        }
+    }
+})
+mod:modify_talent_buff_template("wood_elf", "kerillian_maidenguard_ress_time", {
+    {
+        multiplier = -0.5,
         stat_buff = "faster_revive",
         buff_func = "buff_defence_on_revived_target",
         event = "on_revived_ally",
@@ -333,7 +345,7 @@ mod:add_talent_buff_template("wood_elf", "defense_on_revived_target_handmaiden_a
 })
 
 
--- Change Description and add 3rd Perk's description
+-- Change Description
 PassiveAbilitySettings.we_2 = {
     description = "career_passive_desc_we_2a_2",
     display_name = "career_passive_name_we_2",
@@ -377,6 +389,81 @@ mod:add_text("career_active_desc_we_2_2", "Kerillian swiftly dashes forward, mov
 -- Talents
 -----------------------
 
+-- Bloodlust --> Vanguard
+-- Change: Stagger THP
+-- Original: Melee killing blows restore temporary health based on the health of the slain enemy.
+local tourneybalance = get_mod("TourneyBalance")
+mod.vanguard_check = function()
+    if not tourneybalance then
+        mod:add_buff_template("rebaltourn_vanguard", {
+            multiplier = 1,
+            name = "vanguard",
+            event_buff = true,
+            buff_func = "rebaltourn_heal_stagger_targets_on_melee",
+            event = "on_stagger",
+            perk = "tank_healing"
+        })
+        
+        mod:add_proc_function("rebaltourn_heal_stagger_targets_on_melee", function (owner_unit, buff, params)
+            if not Managers.state.network.is_server then
+                return
+            end
+        
+            if ALIVE[owner_unit] then
+                local hit_unit = params[1]
+                local damage_profile = params[2]
+                local attack_type = damage_profile.charge_value
+                local stagger_value = params[6]
+                local stagger_type = params[4]
+                local buff_type = params[7]
+                local target_index = params[8]
+                local breed = AiUtils.unit_breed(hit_unit)
+                local multiplier = buff.multiplier
+                local is_push = damage_profile.is_push
+                local stagger_calulation = stagger_type or stagger_value
+                local heal_amount = stagger_calulation * multiplier --stagger_value * multiplier
+                local death_extension = ScriptUnit.has_extension(hit_unit, "death_system")
+                local is_corpse = death_extension.death_is_done == false
+        
+                if is_push then
+                    heal_amount = 0.6
+                end
+                
+                local inventory_extension = ScriptUnit.extension(owner_unit, "inventory_system")
+                local equipment = inventory_extension:equipment()
+                local slot_data = equipment.slots.slot_melee
+            
+                if slot_data then
+                    local item_data = slot_data.item_data
+                    local item_name = item_data.name
+                    if item_name == "wh_2h_billhook" and heal_amount == 9 then
+                        heal_amount = 2
+                    end
+                     if item_name == "bw_flame_sword" and attack_type == "heavy_attack" and heal_amount == 1 then
+                        heal_amount = 2
+                     end
+                end
+        
+                if target_index and target_index < 5 and breed and not breed.is_hero and (attack_type == "light_attack" or attack_type == "heavy_attack" or attack_type == "action_push") and not is_corpse then
+                    DamageUtils.heal_network(owner_unit, owner_unit, heal_amount, "heal_from_proc")
+                end
+            end
+        end)
+
+        mod:add_text("vanguard_name", "Vanguard")
+    end
+end
+mod:vanguard_check()
+mod:modify_talent("we_maidenguard", 1, 2, {
+    name = "vanguard_name",
+    description = "vanguard_desc",
+    buffs = {
+        "rebaltourn_vanguard"
+    }
+})
+
+
+
 -- Focused Spirit (Works)
 -- Change: 15/20/25% Damage at 50/65/80% Health.
 -- Original: After not taking damage for 10 seconds, increases Kerillian's power by 15.0%. Reset upon taking damage.
@@ -385,14 +472,14 @@ mod:modify_talent("we_maidenguard", 2, 1, {
     name = "focused_spirit_name",
     description = "focused_spirit_desc",
     num_ranks = 1,
-    buffer = "server",
+    buffer = "both",
     icon = "kerillian_maidenguard_power_level_on_unharmed",
     buffs = {
         "focused_spirit_update",
     }
 })
 mod:add_text("focused_spirit_name", "Focused Spirit")
-mod:add_text("focused_spirit_desc", "While above 50%% health Kerillian gains 8%% increased weapon damage. Stacks 3 times (at 65%% and 80%% health).")
+mod:add_text("focused_spirit_desc", "While above 50%% health Kerillian gains 10%% increased weapon damage. Stacks 3 times (at 65%% and 80%% health).")
 
 mod:add_talent_buff_template("wood_elf", "focused_spirit_update", {
     {
@@ -407,7 +494,7 @@ mod:add_talent_buff_template("wood_elf", "focused_spirit_damage_dealt_buff", {
         max_stacks = 3,
         icon = "kerillian_maidenguard_power_level_on_unharmed",
         stat_buff = "increased_weapon_damage",
-        multiplier = 0.08
+        multiplier = 0.10
     }
 })
 BuffFunctionTemplates.functions.update_server_buff_on_health_percent_handmaiden_adjust = function (owner_unit, buff, params)
@@ -427,7 +514,6 @@ BuffFunctionTemplates.functions.update_server_buff_on_health_percent_handmaiden_
             local health_threshold1 = 0.5
             local health_threshold2 = 0.65
             local health_threshold3 = 0.8
-            --local health_threshold4 = 1
 
             if current_health > max_health * health_threshold1 and not buff.has_buff1 then
                 local buff_system = Managers.state.entity:system("buff_system")
@@ -461,24 +547,10 @@ BuffFunctionTemplates.functions.update_server_buff_on_health_percent_handmaiden_
 
                 buff.has_buff3 = nil
             end
-
-            -- if current_health >= max_health * health_threshold4 and not buff.has_buff4 then
-            --     local buff_system = Managers.state.entity:system("buff_system")
-            --     buff.has_buff4 = buff_system:add_buff(owner_unit, buff_to_add, owner_unit, true)
-            -- elseif current_health < max_health * health_threshold4 and buff.has_buff4 then
-            --     local buff_system = Managers.state.entity:system("buff_system")
-
-            --     buff_system:remove_server_controlled_buff(owner_unit, buff.has_buff4)
-
-            --     buff.has_buff4 = nil
-            -- end
         end
     end
 end
 BuffFunctionTemplates.functions.remove_server_buff_on_health_percent_handmaiden_adjust = function (owner_unit, buff, params)
-    if not Managers.state.network.is_server then
-        return
-    end
 
     if ALIVE[owner_unit] and buff.has_buff then
         local buff_system = Managers.state.entity:system("buff_system")
@@ -492,7 +564,7 @@ end
 
 
 
--- Oak Stance (works)
+-- Oak Stance (crash when swapping your ranged weapon)
 -- Change: Max 15% crit chance, scales with stamina %
 -- Original: Increases critical strike chance by 5.0%.
 
@@ -500,8 +572,8 @@ mod:modify_talent("we_maidenguard", 2, 2, {
     name = "oak_stance_name",
     description = "oak_stance_desc",
     num_ranks = 1,
-    buffer = "server",
-    icon = "kerillian_maidenguard_power_level_on_unharmed",
+    buffer = "both",
+    icon = "kerillian_maidenguard_damage_reduction_on_last_standing",
     buffs = {
         "oak_stance_update",
     }
@@ -524,81 +596,51 @@ mod:add_talent_buff_template("wood_elf", "oak_stance_crit_chance_buff", {
         bonus = 0.05
     }
 })
--- Check for how much stamina hanmaiden has and add 1 to 3 stacks according to it
+-- Check how much stamina hanmaiden has and add 1 to 3 stacks according to it
 BuffFunctionTemplates.functions.crit_chance_for_stamina_handmaiden_adjust = function (owner_unit, buff, params)
+    if not Managers.state.network.is_server then
+        return
+    end
+
     if ALIVE[owner_unit] then
-
-        local buff_to_add = buff.template.buff_to_add
         local status_extension = ScriptUnit.has_extension(owner_unit, "status_system")
-        local current_fatigue = status_extension:current_fatigue_points()
         local max_fatigue = status_extension:get_current_max_fatigue_points_handmaiden_adjust()
-        local MeleeBuffTypes = params[5]
 
-        if MeleeBuffTypes == "MELEE_1H" or MeleeBuffTypes == "MELEE_2H" then
-                local fatigue_80 = max_fatigue * 0.2
-                local fatigue_65 = max_fatigue * 0.35
-                local fatigue_50 = max_fatigue * 0.5
+        if status_extension and max_fatigue then
 
-                if current_fatigue < fatigue_80 and not buff.has_buff1 then
-                    local buff_system = Managers.state.entity:system("buff_system")
-                    buff.has_buff1 = buff_system:add_buff(owner_unit, buff_to_add, owner_unit, true)
-                elseif current_fatigue >= fatigue_80 and buff.has_buff1 then
-                    local buff_system = Managers.state.entity:system("buff_system")
-                    buff_system:remove_server_controlled_buff(owner_unit, buff.has_buff1)
-                    buff.has_buff1 = nil
-                end
-        
-                if current_fatigue <= fatigue_65 and not buff.has_buff2 then
-                    local buff_system = Managers.state.entity:system("buff_system")
-                    buff.has_buff2 = buff_system:add_buff(owner_unit, buff_to_add, owner_unit, true)
-                elseif current_fatigue >= fatigue_65 and buff.has_buff2 then
-                    local buff_system = Managers.state.entity:system("buff_system")
-                    buff_system:remove_server_controlled_buff(owner_unit, buff.has_buff2)
-                    buff.has_buff2 = nil
-                end
-        
-                if current_fatigue <= fatigue_50 and not buff.has_buff3 then
-                    local buff_system = Managers.state.entity:system("buff_system")
-                    buff.has_buff3 = buff_system:add_buff(owner_unit, buff_to_add, owner_unit, true)
-                elseif current_fatigue >= fatigue_50 and buff.has_buff3 then
-                    local buff_system = Managers.state.entity:system("buff_system")
-                    buff_system:remove_server_controlled_buff(owner_unit, buff.has_buff3)
-                    buff.has_buff3 = nil
-                end
+            local buff_to_add = buff.template.buff_to_add
+            local current_fatigue = status_extension:current_fatigue_points()
 
-            else
+            local fatigue_80 = max_fatigue * 0.2
+            local fatigue_65 = max_fatigue * 0.35
+            local fatigue_50 = max_fatigue * 0.5
 
-                local max_fatigue = 10
-                local fatigue_80 = max_fatigue * 0.2
-                local fatigue_65 = max_fatigue * 0.35
-                local fatigue_50 = max_fatigue * 0.5
+            if current_fatigue < fatigue_80 and not buff.has_buff1 then
+                local buff_system = Managers.state.entity:system("buff_system")
+                buff.has_buff1 = buff_system:add_buff(owner_unit, buff_to_add, owner_unit, true)
+            elseif current_fatigue >= fatigue_80 and buff.has_buff1 then
+                local buff_system = Managers.state.entity:system("buff_system")
+                buff_system:remove_server_controlled_buff(owner_unit, buff.has_buff1)
+                buff.has_buff1 = nil
+            end
 
-                if current_fatigue < fatigue_80 and not buff.has_buff1 then
-                    local buff_system = Managers.state.entity:system("buff_system")
-                    buff.has_buff1 = buff_system:add_buff(owner_unit, buff_to_add, owner_unit, true)
-                elseif current_fatigue >= fatigue_80 and buff.has_buff1 then
-                    local buff_system = Managers.state.entity:system("buff_system")
-                    buff_system:remove_server_controlled_buff(owner_unit, buff.has_buff1)
-                    buff.has_buff1 = nil
-                end
-        
-                if current_fatigue <= fatigue_65 and not buff.has_buff2 then
-                    local buff_system = Managers.state.entity:system("buff_system")
-                    buff.has_buff2 = buff_system:add_buff(owner_unit, buff_to_add, owner_unit, true)
-                elseif current_fatigue >= fatigue_65 and buff.has_buff2 then
-                    local buff_system = Managers.state.entity:system("buff_system")
-                    buff_system:remove_server_controlled_buff(owner_unit, buff.has_buff2)
-                    buff.has_buff2 = nil
-                end
-        
-                if current_fatigue <= fatigue_50 and not buff.has_buff3 then
-                    local buff_system = Managers.state.entity:system("buff_system")
-                    buff.has_buff3 = buff_system:add_buff(owner_unit, buff_to_add, owner_unit, true)
-                elseif current_fatigue >= fatigue_50 and buff.has_buff3 then
-                    local buff_system = Managers.state.entity:system("buff_system")
-                    buff_system:remove_server_controlled_buff(owner_unit, buff.has_buff3)
-                    buff.has_buff3 = nil
-                end
+            if current_fatigue <= fatigue_65 and not buff.has_buff2 then
+                local buff_system = Managers.state.entity:system("buff_system")
+                buff.has_buff2 = buff_system:add_buff(owner_unit, buff_to_add, owner_unit, true)
+            elseif current_fatigue >= fatigue_65 and buff.has_buff2 then
+                local buff_system = Managers.state.entity:system("buff_system")
+                buff_system:remove_server_controlled_buff(owner_unit, buff.has_buff2)
+                buff.has_buff2 = nil
+            end
+
+            if current_fatigue <= fatigue_50 and not buff.has_buff3 then
+                local buff_system = Managers.state.entity:system("buff_system")
+                buff.has_buff3 = buff_system:add_buff(owner_unit, buff_to_add, owner_unit, true)
+            elseif current_fatigue >= fatigue_50 and buff.has_buff3 then
+                local buff_system = Managers.state.entity:system("buff_system")
+                buff_system:remove_server_controlled_buff(owner_unit, buff.has_buff3)
+                buff.has_buff3 = nil
+            end
         end
     end
 end
@@ -616,32 +658,30 @@ GenericStatusExtension.get_current_max_fatigue_points_handmaiden_adjust = functi
             local item_template = slot_data_name.item_template or BackendUtils.get_item_template(item_data)
             local max_fatigue_points = item_template.max_fatigue_points
             max_fatigue_points = max_fatigue_points and math.clamp(self.buff_extension:apply_buffs_to_value(max_fatigue_points, "max_fatigue"), 1, 100)
-
+            
             return max_fatigue_points
 
-        else if get_wielded_slot_name == weapon_slot_ranged then
+        else if slot_data_name and get_wielded_slot_name == weapon_slot_ranged then
             local item_data = slot_data_name.item_data
             local item_template = slot_data_name.item_template or BackendUtils.get_item_template(item_data)
             local max_fatigue_points = item_template.max_fatigue_points
             max_fatigue_points = 10
-
+            
             return max_fatigue_points
         end
     end
 end
 BuffFunctionTemplates.functions.remove_server_buff_on_stamina_percent_handmaiden_adjust = function (owner_unit, buff, params)
-    if not Managers.state.network.is_server then
-        return
-    end
 
     if ALIVE[owner_unit] and buff.has_buff then
         local buff_system = Managers.state.entity:system("buff_system")
 
-        buff_system:remove_server_controlled_buff(owner_unit, buff.has_buff)
+        buff_system:remove_buff(owner_unit, buff.has_buff)
 
         buff.has_buff = nil
     end
 end
+
 
 
 
@@ -717,7 +757,7 @@ mod:add_talent_buff_template("wood_elf", "kerillian_maidenguard_power_on_blocked
 mod:add_talent_buff_template("wood_elf", "kerillian_maidenguard_speed_on_block_dummy_buff", {
     {
         max_stacks = 4, --2
-        icon = "kerillian_maidenguard_power_level_on_unharmed"
+        icon = "kerillian_maidenguard_improved_dodge"
     }
 })
 -- Attack Speed (30%)
@@ -837,7 +877,7 @@ mod:add_talent_buff_template("wood_elf", "kerillian_maidenguard_passive_attack_s
 
 
 -- Dance of Blades -> (Dance of Seasons) (Works)
--- Change: Holding block grants infinite dodge count. Dodging while not blocking grants 25% DR for 2 sec
+-- Change: Holding block grants infinite dodge count. Dodging while not blocking grants 30% DR for 2 sec
 -- Original: Dodging while blocking increases dodge range by 20%. Dodging while not blocking increases Kerillian's power by 10% for 2 seconds.
 
 mod:modify_talent("we_maidenguard", 4, 2, {
@@ -851,7 +891,7 @@ mod:modify_talent("we_maidenguard", 4, 2, {
     }
 })
 mod:add_text("dance_of_seasons_name", "Dance of Blades")
-mod:add_text("dance_of_seasons_desc", "Dodging while blocking grants infinite dodges for 2 seconds. Dodging while not blocking grants 25%% damage reduction for 2 seconds.")
+mod:add_text("dance_of_seasons_desc", "Dodging while blocking grants infinite dodges for 2 seconds. Dodging while not blocking grants 30%% damage reduction for 2 seconds.")
 
 -- Overarching Buff Handler
 mod:add_talent_buff_template("wood_elf", "dance_of_seasons", {
@@ -880,7 +920,7 @@ mod:add_talent_buff_template("wood_elf", "dance_of_seasons_no_block", {
     {
         stat_buff = "damage_taken",
         refresh_durations = true,
-        multiplier = -0.25,
+        multiplier = -0.3,
         max_stacks = 1,
         icon = "kerillian_maidenguard_cooldown_on_nearby_allies",
         duration = 2
@@ -991,7 +1031,7 @@ mod:add_talent_buff_template("wood_elf", "wraith_pact_dodge_distance_speed_buff"
 
 
 
--- Heart of Oak (works)
+-- Heart of Oak
 -- 50% DR against Area Aura
 -- Original: Increases max health by 15.0%.
 
@@ -1006,7 +1046,7 @@ mod:modify_talent("we_maidenguard", 5, 1, {
     }
 })
 mod:add_text("heart_of_oak_name", "Heart of Oak")
-mod:add_text("heart_of_oak_desc", "(BROKEN ask Fatshark) Aura that reduces area damage by 50%% for the entire team.")
+mod:add_text("heart_of_oak_desc", "Aura that reduces area damage by 50%% for the entire team.")
 -- Create Aura (Teambuff with Range)
 mod:add_talent_buff_template("wood_elf", "heart_of_oak_aura", {
     {
@@ -1025,6 +1065,29 @@ mod:add_talent_buff_template("wood_elf", "heart_of_oak_buff", {
         multiplier = -0.5,
     }
 })
+-- Fix Poison Damage Reduction not Working
+local POISON_DAMAGE_TYPES = {
+	aoe_poison_dot = true,
+	poison = true,
+	arrow_poison = true,
+	arrow_poison_dot = true
+}
+local POISON_DAMAGE_SOURCES = {
+	skaven_poison_wind_globadier = true,
+	poison_dot = true
+}
+mod:hook(DamageUtils, "apply_buffs_to_damage", function (func, current_damage, attacked_unit, attacker_unit, damage_source, ...)
+    if ScriptUnit.has_extension(attacked_unit, "buff_system") then
+        local buff_extension = ScriptUnit.extension(attacked_unit, "buff_system")
+        
+        if DAMAGE_TYPES_AOE[damage_type] or POISON_DAMAGE_TYPES[damage_type] or POISON_DAMAGE_SOURCES[damage_source] then
+            current_damage = buff_extension:apply_buffs_to_value(current_damage, "protection_aoe")
+        end
+
+    end
+    
+    return func(current_damage, attacked_unit, attacker_unit, damage_source, ...)
+end)
 
 
 
@@ -1032,7 +1095,6 @@ mod:add_talent_buff_template("wood_elf", "heart_of_oak_buff", {
 -- Birch Stance (works)
 -- 2 Stamina Shield/4 Stamina Aura
 -- Original: Reduces block cost by 30.0%.
--- kerillian_maidenguard_block_cost
 
 mod:modify_talent("we_maidenguard", 5, 2, {
     name = "birch_stance_name",
@@ -1045,7 +1107,7 @@ mod:modify_talent("we_maidenguard", 5, 2, {
     }
 })
 mod:add_text("birch_stance_name", "Birch Stance")
-mod:add_text("birch_stance_desc", "Teammembers will receive 2 stamina shields when staying close to Kerillian.")
+mod:add_text("birch_stance_desc", "The Ubersreik five will receive 2 stamina shields when staying close to Kerillian.")
 -- Create Aura (Teambuff with Range)
 mod:add_talent_buff_template("wood_elf", "birch_stance_aura", {
     {
@@ -1083,7 +1145,7 @@ mod:modify_talent("we_maidenguard", 5, 3, {
     }
 })
 mod:add_text("quiver_of_plenty_name", "Quiver of Plenty")
-mod:add_text("quiver_of_plenty_desc", "Kerillian allows teammembers in close proximity to restore 5%% of maximum ammunition when hitting a critical hit.")
+mod:add_text("quiver_of_plenty_desc", "Kerillian allows teamembers in close proximity and herself to restore 5%% of maximum ammunition when hitting a critical hit.")
 -- Create Aura (Teambuff with Range)
 mod:add_talent_buff_template("wood_elf", "quiver_of_plenty_aura", {
     {
@@ -1270,7 +1332,7 @@ end
 
 
 -- Gift of Ladrielle (works)
--- Invis last 5 sec, Now applies old Bladedancer bleed
+-- Invis last 3 sec, Now applies old Bladedancer bleed
 -- Original: Kerillian disappears from enemy perception for 2 seconds after using Dash.
 
 mod:modify_talent("we_maidenguard", 6, 1, {
@@ -1284,7 +1346,7 @@ mod:modify_talent("we_maidenguard", 6, 1, {
     }
 })
 mod:add_text("gift_of_ladrielle_name", "Gift of Ladrielle")
-mod:add_text("gift_of_ladrielle_desc", "Kerillian's dashes cause hit enemies to bleed and herself to become invisible for 5 seconds.")
+mod:add_text("gift_of_ladrielle_desc", "Kerillian's dashes cause hit enemies to bleed and herself to become invisible for 3 seconds.")
 
 -- Increase Invis duration to 5 seconds
 mod:modify_talent_buff_template("wood_elf", "kerillian_maidenguard_activated_ability_invis_duration", {
@@ -1294,7 +1356,7 @@ mod:modify_talent_buff_template("wood_elf", "kerillian_maidenguard_activated_abi
         icon = "kerillian_maidenguard_activated_ability_invis_duration",
         max_stacks = 1,
         remove_buff_func = "end_maidenguard_activated_ability",
-        duration = 5 -- 2
+        duration = 3 -- 2
     }
 })
 
@@ -1422,7 +1484,7 @@ end
 
 
 -- Bladedancer (works)
--- Each enemy hit by Dash increases cleave by 10% and Health Regen by 3% for 15 sec, stack up to 10 times
+-- Each enemy hit by Dash increases cleave by 20% and Health Regen by 10% for 15 sec, stack up to 5 times
 -- Original: Dashing through an enemy causes them to bleed for significant damage over time.
 
 mod:modify_talent("we_maidenguard", 6, 2, {
@@ -1436,7 +1498,7 @@ mod:modify_talent("we_maidenguard", 6, 2, {
     }
 })
 mod:add_text("bladedancer_name", "Bladedancer")
-mod:add_text("bladedancer_desc", "Each enemy hit with Dash grants 10%% cleave power and 3%% increased healing for 15 seconds. Stacks up to 10 times.")
+mod:add_text("bladedancer_desc", "Each enemy hit with Dash grants 20%% cleave power and 10%% increased healing for 15 seconds. Stacks up to 5 times.")
 
 mod:add_talent_buff_template("wood_elf", "bladedancer_event_handmaiden_adjust", {
     {
@@ -1451,9 +1513,9 @@ BuffTemplates.bladedancer_buff_handmaiden_adjust = {
             name = "bladedancer_buff_handmaiden_adjust_1",
             refresh_durations = true,
             stat_buff = "power_level_melee_cleave",
-            max_stacks = 10,
+            max_stacks = 5,
             duration = 15,
-            multiplier = 0.1
+            multiplier = 0.2
         },
         {
             name = "bladedancer_buff_handmaiden_adjust_2",
@@ -1461,9 +1523,9 @@ BuffTemplates.bladedancer_buff_handmaiden_adjust = {
             refresh_durations = true,
             priority_buff = true,
             stat_buff = "healing_received",
-            max_stacks = 10,
+            max_stacks = 5,
             duration = 15,
-            multiplier = 0.03
+            multiplier = 0.1
         }
     }
 }
@@ -1526,4 +1588,4 @@ NetworkLookup.buff_templates["power_from_pain_buff_handmaiden_adjust"] = index
 
 
 
-mod:echo("Handmaiden Adjust v1.0.0 enabled")
+mod:echo("Handmaiden Adjust v1.0.1 enabled")

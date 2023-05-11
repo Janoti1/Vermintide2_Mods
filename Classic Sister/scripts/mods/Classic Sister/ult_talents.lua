@@ -394,6 +394,8 @@ ThornSisterWallExtension.init = function (self, extension_init_context, unit, ex
 	side_manager:add_unit_to_side(unit, side_id)
 end
 -- removed debuff wall, set explosive wall for Bots
+local wall_max_distance_sq = 100
+local wall_placement_bias = 1.5
 BTConditions.can_activate.we_thornsister = function (blackboard)
 	local self_unit = blackboard.unit
 	local talent_extension = ScriptUnit.has_extension(self_unit, "talent_system")
@@ -420,7 +422,7 @@ BTConditions.can_activate.we_thornsister = function (blackboard)
 		if wall_target_distance_sq <= wall_max_distance_sq and wall_target_distance_sq >= 4 then
 			if is_smiter_ability then
 				local target_breed = target_blackboard and target_blackboard.breed
-				local target_threat_value = (target_breed and target_breed.threat_value) or 0
+				local target_threat_value = target_breed and target_breed.threat_value or 0
 
 				if target_unit == blackboard.priority_target_enemy or target_unit == blackboard.urgent_target_enemy or target_unit == blackboard.opportunity_target_enemy or target_threat_value >= 8 then
 					wall_target = target_unit
@@ -457,6 +459,7 @@ BTConditions.can_activate.we_thornsister = function (blackboard)
 
 	return false
 end
+
 -- replaced new ults with old ones
 ActionCareerWEThornsisterWall.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level, action_init_data)
 	action_init_data = action_init_data or {}

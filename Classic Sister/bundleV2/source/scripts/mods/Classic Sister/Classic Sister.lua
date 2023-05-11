@@ -277,7 +277,7 @@ local function updateValues()
 
 end
 mod.on_enabled = function (self)
-	mod:echo("Classic Sister v1.3.0 enabled")
+	mod:echo("Classic Sister v1.3.1 enabled")
 	updateValues()
 end
 

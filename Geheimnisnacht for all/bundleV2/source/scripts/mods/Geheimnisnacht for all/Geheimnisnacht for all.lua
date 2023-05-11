@@ -289,13 +289,34 @@ local event_settings = {
 			}
 		}
 	},
-	--Trail of Treachery
-	dlc_wizards_trail = {
+	--Trail
+	dlc_wizards_trail = { --trails of treachery
 		ritual_locations = {
 			{
 				190.79,
 				-14.60,
 				407.12,
+				0
+			}
+		}
+	},
+	dlc_wizards_tower = { --tower of treachery
+		ritual_locations = {
+			{
+				18.94,
+				17.052,
+				6.99,
+				0
+			}
+		}
+	},
+	--bonus
+	dlc_celebrate_crawl = { --a quiet drink
+		ritual_locations = {
+			{
+				-38.53,
+				-160.55,
+				-25.39,
 				0
 			}
 		}
@@ -377,7 +398,7 @@ MutatorTemplates["geheimnisnacht_2021"]["server_start_function"] = function(cont
 end
 
 mod.on_game_state_changed = function(status, state)
-    if status == "enter" and state == "StateIngame" then
+    if status == "enter" and state == "StateIngame" and mod:is_enabled() then
         local mutator_handler = Managers.state.game_mode._mutator_handler
 
         if not mutator_handler:has_activated_mutator("geheimnisnacht_2021") then
@@ -392,4 +413,4 @@ mod.on_game_state_changed = function(status, state)
     end
 end
 
-mod:echo("Geheimnisnacht+ v1.1 enabled")
+mod:echo("Geheimnisnacht+ v1.2 enabled")

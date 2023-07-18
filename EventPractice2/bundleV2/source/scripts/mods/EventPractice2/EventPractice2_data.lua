@@ -18,7 +18,7 @@ return {
 			{
                 setting_id = "get_loot_rats",
                 type = "checkbox",
-                default_value = true
+                default_value = false
             },
 			{
                 setting_id = "composition_chat_output",

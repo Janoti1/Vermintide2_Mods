@@ -6,6 +6,13 @@ local mod = get_mod("EventPractice2")
 local tpLocations = {
     -- Keep
     ["inn_level"] = {{19.875248, -2.043680, 2.852175}},
+	-- Event Keep
+	["inn_level_skulls"] = {{19.875248, -2.043680, 2.852175}},
+	["inn_level_celebrate"] = {{19.875248, -2.043680, 2.852175}},
+	["inn_level_sonnstill"] = {{19.875248, -2.043680, 2.852175}},
+	["inn_level_halloween"] = {{19.875248, -2.043680, 2.852175}},
+	-- Pilgrimage Chamber
+	["morris_hub"] = {{-0.050925, 14.923369, -4.808733}},
     -- Rightous Stand
     ["military"] = {{121.715, 120.592, -15.3158}, {-197.716, -69.3024, 70.175}},
 	-- Convocation of Decay
@@ -18,8 +25,8 @@ local tpLocations = {
     ["elven_ruins"] = {{349.908, 331.74, 25.778}},
 	-- Screaming Bell (is first an event?)
     ["bell"] = {{-5.16007, -192.023, -29.1902}, {-7.64211, -444.317, 40.8632}},
-	-- Fort Brachsenbrücke (first trigger for elevator)
-    ["fort"] = {{-4.12488, -8.34518, -20.9654},{-25.8038, 24.6713, -0.184609}},
+	-- Fort Brachsenbrücke
+    ["fort"] = {{-25.8038, 24.6713, -0.184609}},
 	-- Into The Nest
     ["skaven_stronghold"] = { {-190.04, 94.92, 27.04}, {180.02, -74.28, 32.87} },
 	-- Against The Grain
@@ -27,15 +34,15 @@ local tpLocations = {
     -- Empire in Flames
     ["ussingen"] = {{-57.144, -13.573, 20.4699}},
 	-- Festering Ground
-    ["nurgle"] = { {-349.687347, 82.144646, 2.094658} },
+    ["nurgle"] = { {-349.687347, 82.144646, 2.094658}},
 	-- War Camp
     ["warcamp"] = { {178.934387, 185.609863, 17.929544}, {196.783051, -83.824829, 41.218258} },
 	-- Skittergate
     ["skittergate"] = { {269.836914, 481.523315, -15.362812}, {127.629379, 334.292572, 9.914454}, {-334.596832, -410.148041, -123.939270}},
 	-- Old Haunts
-    ["dlc_portals"] = { {-185.013992, 119.351524, -42.627037}, {173.952271, 22.620922, 25.472994}},
+    ["dlc_portals"] = { {-223.835236, 107.028191, -47.077473}, {173.952271, 22.620922, 25.472994}},
 	-- Blood in Darkness
-    ["dlc_bastion"] = { {65.788605, 33.256676, -26.338324}, {41.785767, 53.660053, 12.333536}, {94.329514, -35.620724, -3.632232}},
+    ["dlc_bastion"] = { {65.788605, 33.256676, -26.338324}, {94.329514, -35.620724, -3.632232}},
 	-- Enchanters Lair
     ["dlc_castle"] = { {-0.897143, 9.424833, 0}, {6.948763, 325.470917, 25.262688}},
     -- The Pit
@@ -47,14 +54,23 @@ local tpLocations = {
 	-- Garden of Morr
     ["cemetery"] = { {24.038063, 62.726257, 1.10111} },
 	-- Engines of War
-    ["forest_ambush"] = { {252.697388, -178.306717, 17.580149}, {498.607941, 28.460766, 0.098653} },
+    ["forest_ambush"] = { {273.402466, -190.658463, 20.469263}, {498.607941, 28.460766, 0.098653} }, 
 	-- Dark Omens
     ["crater"] = { {74.783218, -405.478455, 40.465588}, {-106.578682, 152.847824, -15.573997} },
-    -- Trail of Treachery (kinda same with skittergate)
+	-- A Quiet Drink
+	["dlc_celebrate_crawl"] = {{43.905552, -134.830582, -39.982006}, {189.500443, -206.181992, -42.103943}, {339.719116, -78.507484, -31.675213}},
+    -- Trail of Treachery (very Problematic)
     ["dlc_wizards_trail"] = {{190.206024, -13.891146, 407.302745}, {115.764877, -152.758682, 386.586578}, {60.555534, -123.071014, 380.793488}, {96.209877, -32.940685, 352.027222}, {-111.540306, -63.5224235, 353.679138} },
 	-- Tower of Treachery 
-	["dlc_wizards_tower"] = {{-50.365894, 27.234823, 10.628690}, {85.225990, 84.022087, 98.207565}, {-6.698, 95.01, 149.292999}}
+	["dlc_wizards_tower"] = {{-50.365894, 27.234823, 10.628690}, {85.225990, 84.022087, 98.207565}, {-6.698, 95.01, 149.292999}},
+	-- Mission of Mercy
+	["dlc_dwarf_interior"] = {{-105.939590, -4.020967, 8.000000}, {-393.291504, -16.531219, -17.999998}},
+	-- A Grudge Served Cold
+	["dlc_dwarf_exterior"] = { {-111.738655, -35.874016, 6.449066}, {35.397568, 223.130341, 21.670361}, {63.102043, 269.570526, 37.722443} },
+	-- Khazukan Kazakit-Ha
+	["dlc_dwarf_beacons"] = { {-141.877380, 81.960373, -25.587093}, {-76.564613, 108.855804, -23.037222}, {14.448167, 100.744186, -30.085823}, {26.456774, 1.498722, -29.470558}, {94.002838, 97.945786, 0.407797}},
 }
+
 
 local NDX = 0
 local TABLE_CLEARED = false
@@ -138,18 +154,16 @@ function clearEvents()
 
     table.clear(enemy_recycler.main_path_events)
 
-    for i = 1, #spawners, 1 do
-        local spawner = spawners[i]
+	for i = 1, #spawners, 1 do
+			local spawner = spawners[i]
 
-        local spawner_pos = Unit.local_position(spawner[1], 0)
-        local boxed_pos = Vector3Box(spawner_pos)
-        local event_data = {event_kind = "event_boss"}
+			local spawner_pos = Unit.local_position(spawner[1], 0)
+			local boxed_pos = Vector3Box(spawner_pos)
+			local event_data = {event_kind = "event_boss"}
 
-        enemy_recycler:add_main_path_terror_event(boxed_pos,
-                                                  "rare_event_loot_rat", 45,
-                                                  event_data)
+			enemy_recycler:add_main_path_terror_event(boxed_pos, "rare_event_loot_rat", 45, event_data)
 
-    end
+	end
 end
 --20
 local triggerIndex = 1
@@ -426,7 +440,7 @@ end)
 
 mod:hook_safe(HordeSpawner, "execute_ambush_horde", function(self, extra_data, side_id, fallback, override_epicenter_pos, optional_data)
     if not mod:get("composition") then return end
-	mod:echo(extra_data.sound_settings) 
+	mod:echo(extra_data.sound_settings)
     print("setting up ambush-horde")
 
 	local settings = CurrentHordeSettings.ambush
@@ -732,4 +746,47 @@ function trails_end_event_start()
 	--Managers.state.conflict:start_terror_event_from_template("trail_end_event_01", "trail_end_event_spawner_1")
 	--Managers.state.conflict:start_terror_event_from_template("trail_end_event_first_wave", "trail_end_event_spawner_1")
 end
+]]
+
+
+
+
+--[[
+
+
+RespawnHandler.set_override_respawn_group = function (self, group_id, enable)
+	mod:echo("override")
+    mod:echo(group_id)
+    mod:echo(enable)
+    mod:echo(Managers.state.game_mode:level_key())
+
+    local h = Vector3(0, 0, 1)
+    local conflict_director = Managers.state.conflict
+    local level_analysis = conflict_director.level_analysis
+    local main_path_data = level_analysis.main_path_data
+    local ahead_travel_dist = conflict_director.main_path_info.ahead_travel_dist
+    local total_travel_dist = main_path_data.total_dist
+    local travel_percentage = ahead_travel_dist / total_travel_dist * 100
+    local point = MainPathUtils.point_on_mainpath(nil, ahead_travel_dist)
+
+    QuickDrawerStay:sphere(point + h, 0.25, Colors.get("red"))
+end
+
+RespawnHandler.set_respawn_after_bridge = function (self, group_id, enable)
+
+	mod:echo("Change")
+    mod:echo(group_id)
+
+	group_id = "after_bridge"
+
+end
+
+
+mod:command( "set_respawn_after_bridge", "", function ()
+	set_respawn_after_bridge()
+end)
+
+RespawnHandler.set_respawn_after_bridge()
+mod:echo(group_id)
+
 ]]

@@ -14,6 +14,11 @@ mod._quick_localize = function (self, text_id)
         end
     end
 end
+mod:hook("Localize", function(func, text_id)
+    local str = mod:_quick_localize(text_id)
+    if str then return str end
+    return func(text_id)
+end)
 function mod.add_text(self, text_id, text)
     if type(text) == "table" then
         _localization_database[text_id] = text
@@ -27,11 +32,7 @@ function mod.add_talent_text(self, talent_name, name, description)
     mod:add_text(talent_name, name)
     mod:add_text(talent_name .. "_desc", description)
 end
-mod:hook("Localize", function(func, text_id)
-    local str = mod:_quick_localize(text_id)
-    if str then return str end
-    return func(text_id)
-end)
+
 
 -- Buff and Talent Functions
 local function is_local(unit)
@@ -255,7 +256,9 @@ end
 -- Perks: https://github.com/Aussiemon/Vermintide-2-Source-Code/blob/03e04b0fc66e8d868a08201718aaa579a771f23d/scripts/unit_extensions/default_player_unit/careers/career_ability_settings.lua#L351
 
 
--- TalentBuffTemplates dont need the buff brakets but one additional layer of brakets, BuffTemplates do, modify talent doesnt need any additional layers
+-- TalentBuffTemplates dont need the buff brakets but one additional layer of brakets, BuffTemplates do, modify talent doesnt need any additional layers#
+-- buffer=nil is the same as buffer="server"
+-- Power things have to be on server the rest can be just over client but depends because fs things
 -- https://docs.google.com/document/d/1PChRYF3b6oKavkZpBSNFizJn_VfdCccHomhoQ6wLuHw/edit
 
 
@@ -297,6 +300,7 @@ mod:add_talent_buff_template("wood_elf", "no_clip_dash_handmaiden_adjust", {
 
 -- Renewal
 -- Aura range increased from 5 to 15
+
 mod:modify_talent_buff_template("wood_elf", "kerillian_maidenguard_passive_stamina_regen_aura", {
     buff_to_add = "kerillian_maidenguard_passive_stamina_regen_buff",
     update_func = "activate_buff_on_distance",
@@ -308,6 +312,7 @@ mod:modify_talent_buff_template("wood_elf", "kerillian_maidenguard_passive_stami
 -- Ariel's Benison (Healing is gone, DR?)
 -- Change: Now instead of healing, revived allies receive 50% DR for 15 sec. 
 -- Original: Increase Kerillian's revive speed by 50%. When Kerillian revives allies, she heals them for 20 health.
+
 mod:modify_talent_buff_template("wood_elf", "kerillian_maidenguard_insta_ress", {
     {
         stat_buff = "faster_revive",
@@ -392,6 +397,7 @@ mod:add_text("career_active_desc_we_2_2", "Kerillian swiftly dashes forward, mov
 -- Bloodlust --> Vanguard
 -- Change: Stagger THP
 -- Original: Melee killing blows restore temporary health based on the health of the slain enemy.
+
 local tourneybalance = get_mod("TourneyBalance")
 mod.vanguard_check = function()
     if not tourneybalance then
@@ -403,7 +409,7 @@ mod.vanguard_check = function()
             event = "on_stagger",
             perk = "tank_healing"
         })
-        
+      
         mod:add_proc_function("rebaltourn_heal_stagger_targets_on_melee", function (owner_unit, buff, params)
             if not Managers.state.network.is_server then
                 return
@@ -564,7 +570,7 @@ end
 
 
 
--- Oak Stance (crash when swapping your ranged weapon)
+-- Oak Stance (Works)
 -- Change: Max 15% crit chance, scales with stamina %
 -- Original: Increases critical strike chance by 5.0%.
 
@@ -572,10 +578,10 @@ mod:modify_talent("we_maidenguard", 2, 2, {
     name = "oak_stance_name",
     description = "oak_stance_desc",
     num_ranks = 1,
-    buffer = "both",
+    buffer = "client",
     icon = "kerillian_maidenguard_damage_reduction_on_last_standing",
     buffs = {
-        "oak_stance_update",
+        "oak_stance_update"
     }
 })
 mod:add_text("oak_stance_name", "Oak Stance")
@@ -584,64 +590,72 @@ mod:add_talent_buff_template("wood_elf", "oak_stance_update", {
     {
         buff_to_add = "oak_stance_crit_chance_buff",
         update_func = "crit_chance_for_stamina_handmaiden_adjust",
-        remove_buff_func = "remove_server_buff_on_stamina_percent_handmaiden_adjust",
-        update_frequency = 0.2
+        update_frequency = 0.2,
     }
 })
 mod:add_talent_buff_template("wood_elf", "oak_stance_crit_chance_buff", {
     {
-        max_stacks = 3,
         icon = "kerillian_maidenguard_damage_reduction_on_last_standing",
         stat_buff = "critical_strike_chance",
-        bonus = 0.05
+        bonus = 0.05,
+        max_stacks = 3
     }
 })
 -- Check how much stamina hanmaiden has and add 1 to 3 stacks according to it
 BuffFunctionTemplates.functions.crit_chance_for_stamina_handmaiden_adjust = function (owner_unit, buff, params)
-    if not Managers.state.network.is_server then
-        return
-    end
 
-    if ALIVE[owner_unit] then
-        local status_extension = ScriptUnit.has_extension(owner_unit, "status_system")
-        local max_fatigue = status_extension:get_current_max_fatigue_points_handmaiden_adjust()
+    if is_local(owner_unit) and ALIVE[owner_unit] then
 
-        if status_extension and max_fatigue then
+        if not buff.stack_ids then
+            buff.stack_ids = {}
+        end
 
-            local buff_to_add = buff.template.buff_to_add
-            local current_fatigue = status_extension:current_fatigue_points()
+        if ALIVE[owner_unit] then
+            local status_extension = ScriptUnit.has_extension(owner_unit, "status_system")
+            local max_fatigue = status_extension:get_current_max_fatigue_points_handmaiden_adjust()
+    
+            if status_extension and max_fatigue then
+                
+                local buff_to_add = buff.template.buff_to_add
+                local current_fatigue = status_extension:current_fatigue_points()
+                local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
+                
+                local fatigue_80 = max_fatigue * 0.2
+                local fatigue_65 = max_fatigue * 0.35
+                local fatigue_50 = max_fatigue * 0.5
 
-            local fatigue_80 = max_fatigue * 0.2
-            local fatigue_65 = max_fatigue * 0.35
-            local fatigue_50 = max_fatigue * 0.5
+                local amount_of_stacks
+                local amount_of_buffs = buff_extension:num_buff_type(buff_to_add)
 
-            if current_fatigue < fatigue_80 and not buff.has_buff1 then
-                local buff_system = Managers.state.entity:system("buff_system")
-                buff.has_buff1 = buff_system:add_buff(owner_unit, buff_to_add, owner_unit, true)
-            elseif current_fatigue >= fatigue_80 and buff.has_buff1 then
-                local buff_system = Managers.state.entity:system("buff_system")
-                buff_system:remove_server_controlled_buff(owner_unit, buff.has_buff1)
-                buff.has_buff1 = nil
-            end
+                if current_fatigue <= fatigue_80 then amount_of_stacks = 3 end
+                if current_fatigue >= fatigue_80 then amount_of_stacks = 2 end
+                if current_fatigue >= fatigue_65 then amount_of_stacks = 1 end
+                if current_fatigue >= fatigue_50 then amount_of_stacks = 0 end
 
-            if current_fatigue <= fatigue_65 and not buff.has_buff2 then
-                local buff_system = Managers.state.entity:system("buff_system")
-                buff.has_buff2 = buff_system:add_buff(owner_unit, buff_to_add, owner_unit, true)
-            elseif current_fatigue >= fatigue_65 and buff.has_buff2 then
-                local buff_system = Managers.state.entity:system("buff_system")
-                buff_system:remove_server_controlled_buff(owner_unit, buff.has_buff2)
-                buff.has_buff2 = nil
-            end
+                if amount_of_buffs < amount_of_stacks then
+                    local difference = amount_of_stacks - amount_of_buffs
+                    for i = 1, difference do
+                        local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
+                        local buff_id = buff_extension:add_buff(buff_to_add)
+                        local stack_ids = buff.stack_ids
+                        stack_ids[#stack_ids + 1] = buff_id
+                        amount_of_buffs = amount_of_buffs + 1
+                    end
+                end
+                if amount_of_buffs > amount_of_stacks then
+                    local difference = amount_of_buffs - amount_of_stacks
+                    for i = 1, difference do
+                        local stack_ids = buff.stack_ids
+                        local buff_id = table.remove(stack_ids, 1)
+                        local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
+                        buff_extension:remove_buff(buff_id)
+                        amount_of_buffs = amount_of_buffs - 1
+                    end
+                end
 
-            if current_fatigue <= fatigue_50 and not buff.has_buff3 then
-                local buff_system = Managers.state.entity:system("buff_system")
-                buff.has_buff3 = buff_system:add_buff(owner_unit, buff_to_add, owner_unit, true)
-            elseif current_fatigue >= fatigue_50 and buff.has_buff3 then
-                local buff_system = Managers.state.entity:system("buff_system")
-                buff_system:remove_server_controlled_buff(owner_unit, buff.has_buff3)
-                buff.has_buff3 = nil
             end
         end
+
     end
 end
 -- recieve stamina data without sending stamina data when ranged weapon is equipped
@@ -654,40 +668,27 @@ GenericStatusExtension.get_current_max_fatigue_points_handmaiden_adjust = functi
     local get_wielded_slot_name = inventory_extension:get_wielded_slot_name()
 
     if slot_data_name and get_wielded_slot_name == weapon_slot_melee then
-            local item_data = slot_data_name.item_data
-            local item_template = slot_data_name.item_template or BackendUtils.get_item_template(item_data)
-            local max_fatigue_points = item_template.max_fatigue_points
-            max_fatigue_points = max_fatigue_points and math.clamp(self.buff_extension:apply_buffs_to_value(max_fatigue_points, "max_fatigue"), 1, 100)
-            
-            return max_fatigue_points
+        local item_data = slot_data_name.item_data
+        local item_template = slot_data_name.item_template or BackendUtils.get_item_template(item_data)
+        local max_fatigue_points = item_template.max_fatigue_points
+        max_fatigue_points = max_fatigue_points and math.clamp(self.buff_extension:apply_buffs_to_value(max_fatigue_points, "max_fatigue"), 1, 100)
+      
+        return max_fatigue_points
 
-        else if slot_data_name and get_wielded_slot_name == weapon_slot_ranged then
-            local item_data = slot_data_name.item_data
-            local item_template = slot_data_name.item_template or BackendUtils.get_item_template(item_data)
-            local max_fatigue_points = item_template.max_fatigue_points
-            max_fatigue_points = 10
-            
-            return max_fatigue_points
-        end
-    end
-end
-BuffFunctionTemplates.functions.remove_server_buff_on_stamina_percent_handmaiden_adjust = function (owner_unit, buff, params)
-
-    if ALIVE[owner_unit] and buff.has_buff then
-        local buff_system = Managers.state.entity:system("buff_system")
-
-        buff_system:remove_buff(owner_unit, buff.has_buff)
-
-        buff.has_buff = nil
+    elseif slot_data_name and get_wielded_slot_name == weapon_slot_ranged then
+        local item_data = slot_data_name.item_data
+        local item_template = slot_data_name.item_template or BackendUtils.get_item_template(item_data)
+        local max_fatigue_points = item_template.max_fatigue_points
+        max_fatigue_points = 10
+      
+        return max_fatigue_points
     end
 end
 
 
 
-
-
--- Asrai Alacrity (working)
--- Change: After push: 30% AS 10% Power 30% HS bonus 4 stacks 
+-- Asrai Alacrity (Works)
+-- Change: After push: 30% AS 10% Power 30% HS bonus 3 stacks 
 -- Original: Blocking an attack or pushing an enemy grants the next two strikes 30% attack speed and 10% power. The buff lasts indefinitely, but does not stack. The buff is applied to any melee or ranged attack that hits an enemy. However, the buff is only consumed when hitting an enemy with a melee attack, or hitting a Skaven Special with a ranged attack.
 
 mod:modify_talent("we_maidenguard", 2, 3, {
@@ -702,9 +703,9 @@ mod:modify_talent("we_maidenguard", 2, 3, {
     }
 })
 mod:add_text("asrai_alacrity_name", "Asrai Alacrity")
-mod:add_text("asrai_alacrity_desc", "Blocking an attack or pushing an enemy grants the next 4 strikes 30%% attack speed and 10%% power and 30%% headshot bonus damage.")
+mod:add_text("asrai_alacrity_desc", "Blocking an attack or pushing an enemy grants the next 3 strikes 30%% attack speed and 10%% power.")
 
--- Add 4 Stacks when Blocking
+-- Add 3 Stacks when Blocking
 mod:add_talent_buff_template("wood_elf", "kerillian_maidenguard_speed_on_block_handmaiden_adjust", {
     {
         buff_to_add = "kerillian_maidenguard_speed_on_block_dummy_buff",
@@ -712,16 +713,16 @@ mod:add_talent_buff_template("wood_elf", "kerillian_maidenguard_speed_on_block_h
         buff_func = "maidenguard_add_power_buff_on_block_handmaiden_adjust",
         event = "on_block",
         update_func = "maidenguard_attack_speed_on_block_update_handmaiden_adjust",
-        amount_to_add = 4, --2
-        max_sub_buff_stacks = 4, --2
+        amount_to_add = 3, --2
+        max_sub_buff_stacks = 3, --2
         stat_increase_buffs = {
             "kerillian_maidenguard_speed_on_block_buff",
             "kerillian_maidenguard_power_on_block_buff",
-            "kerillian_maidenguard_hs_power_on_block_buff"
+            --"kerillian_maidenguard_hs_power_on_block_buff"
         }
 	}
 })
--- Add 4 Stacks when Pushing
+-- Add 3 Stacks when Pushing
 mod:add_talent_buff_template("wood_elf", "kerillian_maidenguard_speed_on_push_handmaiden_adjust", {
     {
         buff_to_add = "kerillian_maidenguard_speed_on_block_dummy_buff",
@@ -729,12 +730,12 @@ mod:add_talent_buff_template("wood_elf", "kerillian_maidenguard_speed_on_push_ha
         buff_func = "maidenguard_add_power_buff_on_block_handmaiden_adjust",
         event = "on_push",
         update_func = "maidenguard_attack_speed_on_block_update_handmaiden_adjust",
-        amount_to_add = 4, --2
-        max_sub_buff_stacks = 4, --2
+        amount_to_add = 3, --2
+        max_sub_buff_stacks = 3, --2
         stat_increase_buffs = {
             "kerillian_maidenguard_speed_on_block_buff",
             "kerillian_maidenguard_power_on_block_buff",
-            "kerillian_maidenguard_hs_power_on_block_buff",
+            --"kerillian_maidenguard_hs_power_on_block_buff",
             "kerillian_maidenguard_power_on_blocked_attacks_remove_damage"
         }
     }
@@ -776,14 +777,14 @@ mod:add_talent_buff_template("wood_elf", "kerillian_maidenguard_power_on_block_b
         multiplier = 0.1
     }
 })
--- Headshot Damage (30%)
-mod:add_talent_buff_template("wood_elf", "kerillian_maidenguard_hs_power_on_block_buff", {
-    {
-        max_stacks = 1,
-        stat_buff = "headshot_multiplier",
-        multiplier = 0.3
-    }
-})
+-- REMOVED -- Headshot Damage (30%)
+-- mod:add_talent_buff_template("wood_elf", "kerillian_maidenguard_hs_power_on_block_buff", {
+--     {
+--         max_stacks = 1,
+--         stat_buff = "headshot_multiplier",
+--         multiplier = 0.3
+--     }
+-- })
 -- Add Buff function (unchanged)
 ProcFunctions.maidenguard_add_power_buff_on_block_handmaiden_adjust = function (owner_unit, buff, params)
     if not Managers.state.network.is_server then
@@ -839,8 +840,8 @@ end
 
 
 
--- Willow Stance (works)
--- Change: 5% Attack Speed on Dodge; 4 Stacks
+-- Willow Stance (works) -- Unchanged
+-- Change: 5% Attack Speed on Dodge; 3 Stacks
 -- Original: 5% Attack Speed on dodge; 3 Stacks
 
 mod:modify_talent("we_maidenguard", 4, 1, {
@@ -854,7 +855,7 @@ mod:modify_talent("we_maidenguard", 4, 1, {
     }
 })
 mod:add_text("willow_stance_name", "Willow Stance")
-mod:add_text("willow_stance_desc", "Dodging grants 5.0%% attack speed for 6 seconds. Stacks up to 4 times.")
+mod:add_text("willow_stance_desc", "Dodging grants 5.0%% attack speed for 6 seconds. Stacks up to 3 times.")
 mod:add_talent_buff_template("wood_elf", "kerillian_maidenguard_passive_attack_speed_on_dodge_handmaiden_adjust", {
     {
         event = "on_dodge",
@@ -867,7 +868,7 @@ mod:add_talent_buff_template("wood_elf", "kerillian_maidenguard_passive_attack_s
         refresh_durations = true,
         icon = "kerillian_maidenguard_passive_attack_speed_on_dodge",
         stat_buff = "attack_speed",
-        max_stacks = 4, --3
+        max_stacks = 3, --3
 		multiplier = 0.05,
 		duration = 6
     }
@@ -965,7 +966,7 @@ end
 
 
 -- Wraith Walk --> Wraith Pact (Works)
--- Change: Reduce dodge distance by 30%, Increases Power by 15%, gains 20% DR
+-- Change: Reduce dodge distance by 35%, Increases Power by 15%, gains 20% DR
 -- Original: Kerillian's dodges can now pass through enemies.
 
 mod:modify_talent("we_maidenguard", 4, 3, {
@@ -1039,7 +1040,7 @@ mod:modify_talent("we_maidenguard", 5, 1, {
     name = "heart_of_oak_name",
     description = "heart_of_oak_desc",
     num_ranks = 1,
-    buffer = "both",
+    buffer = "server",
     icon = "kerillian_maidenguard_max_stamina",
     buffs = {
         "heart_of_oak_aura"
@@ -1047,6 +1048,7 @@ mod:modify_talent("we_maidenguard", 5, 1, {
 })
 mod:add_text("heart_of_oak_name", "Heart of Oak")
 mod:add_text("heart_of_oak_desc", "Aura that reduces area damage by 50%% for the entire team.")
+
 -- Create Aura (Teambuff with Range)
 mod:add_talent_buff_template("wood_elf", "heart_of_oak_aura", {
     {
@@ -1100,7 +1102,7 @@ mod:modify_talent("we_maidenguard", 5, 2, {
     name = "birch_stance_name",
     description = "birch_stance_desc",
     num_ranks = 1,
-    buffer = "both",
+    buffer = "server",
     icon = "kerillian_maidenguard_block_cost",
     buffs = {
         "birch_stance_aura"
@@ -1138,14 +1140,14 @@ mod:modify_talent("we_maidenguard", 5, 3, {
     name = "quiver_of_plenty_name",
     description = "quiver_of_plenty_desc",
     num_ranks = 1,
-    buffer = "both",
+    buffer = "server",
     icon = "kerillian_maidenguard_max_ammo",
     buffs = {
         "quiver_of_plenty_aura"
     }
 })
 mod:add_text("quiver_of_plenty_name", "Quiver of Plenty")
-mod:add_text("quiver_of_plenty_desc", "Kerillian allows teamembers in close proximity and herself to restore 5%% of maximum ammunition when hitting a critical hit.")
+mod:add_text("quiver_of_plenty_desc", "Kerillian allows nearby allies and herself to restore 5%% of maximum ammunition when hitting a critical hit.")
 -- Create Aura (Teambuff with Range)
 mod:add_talent_buff_template("wood_elf", "quiver_of_plenty_aura", {
     {
@@ -1484,7 +1486,7 @@ end
 
 
 -- Bladedancer (works)
--- Each enemy hit by Dash increases cleave by 20% and Health Regen by 10% for 15 sec, stack up to 5 times
+-- Each enemy hit by Dash increases melee cleave by 20% and Health Regen by 10% for 15 sec, stack up to 5 times
 -- Original: Dashing through an enemy causes them to bleed for significant damage over time.
 
 mod:modify_talent("we_maidenguard", 6, 2, {
@@ -1498,7 +1500,7 @@ mod:modify_talent("we_maidenguard", 6, 2, {
     }
 })
 mod:add_text("bladedancer_name", "Bladedancer")
-mod:add_text("bladedancer_desc", "Each enemy hit with Dash grants 20%% cleave power and 10%% increased healing for 15 seconds. Stacks up to 5 times.")
+mod:add_text("bladedancer_desc", "Each enemy hit with Dash grants 20%% melee cleave power and 10%% increased healing for 15 seconds. Stacks up to 5 times.")
 
 mod:add_talent_buff_template("wood_elf", "bladedancer_event_handmaiden_adjust", {
     {
@@ -1537,7 +1539,7 @@ NetworkLookup.buff_templates["bladedancer_buff_handmaiden_adjust"] = index
 
 
 -- Power from Pain (works)
--- Each enemy hit by Dash increases crit chance by 6% and crit power by 10% for 15 sec, stack up to 5 times
+-- Each enemy hit by Dash increases crit chance by 4% and crit power by 8% for 15 sec, stack up to 5 times
 -- Original: Each enemy hit with Dash grants 5.0% critical strike chance for 15 seconds. Stacks up to 5 times.
 
 mod:modify_talent("we_maidenguard", 6, 3, {
@@ -1551,7 +1553,7 @@ mod:modify_talent("we_maidenguard", 6, 3, {
     }
 })
 mod:add_text("power_from_pain_name", "Power from Pain")
-mod:add_text("power_from_pain_desc", "Each enemy hit with Dash grants 6%% critical strike chance and 10%% crit power for 15 seconds. Stacks up to 5 times.")
+mod:add_text("power_from_pain_desc", "Each enemy hit with Dash grants 4%% critical strike chance and 8%% crit power for 15 seconds. Stacks up to 5 times.")
 
 mod:add_talent_buff_template("wood_elf", "power_from_pain_event_handmaiden_adjust", {
     {
@@ -1568,7 +1570,7 @@ BuffTemplates.power_from_pain_buff_handmaiden_adjust = {
             stat_buff = "critical_strike_chance",
             max_stacks = 5,
             duration = 15,
-            bonus = 0.06
+            bonus = 0.04
         },
         {
             name = "power_from_pain_buff_handmaiden_adjust_2",
@@ -1578,7 +1580,7 @@ BuffTemplates.power_from_pain_buff_handmaiden_adjust = {
             stat_buff = "critical_strike_effectiveness",
             max_stacks = 5,
             duration = 15,
-            multiplier = 0.1
+            multiplier = 0.08
         }
     }
 }
@@ -1588,4 +1590,4 @@ NetworkLookup.buff_templates["power_from_pain_buff_handmaiden_adjust"] = index
 
 
 
-mod:echo("Handmaiden Adjust v1.0.1 enabled")
+mod:echo("Handmaiden Adjust v1.0.2 enabled")

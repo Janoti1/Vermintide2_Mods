@@ -1,0 +1,11 @@
+mod = [
+	"gk_quest_weave"
+]
+
+package = [
+	"resource_packages/gk_quest_weave/gk_quest_weave"
+]
+
+lua = [
+	"scripts/mods/gk_quest_weave/*"
+]

@@ -30,10 +30,10 @@ function mod.add_text(self, text_id, text)
 end
 
 
-
 -- variable checks
 mod.splash_screen_check = true
 mod.previos_score_big = 0
+
 
 -- Add Challenge to
 InGameChallengeTemplates.weave_score_percent_big = {
@@ -70,6 +70,10 @@ end
 PassiveAbilityQuestingKnight._get_possible_challenges = function (self)
 	local mechanism_name = Managers.state.game_mode:game_mode_key()
 	local settings = mod.challenge_settings_adjusted[mechanism_name] or mod.challenge_settings_adjusted.default
+    local level_key = Managers.state.game_mode._level_key
+    if level_key == "plaza" or level_key == "dlc_celebrate_crawl" then 
+        settings = mod.challenge_settings_adjusted.default
+    end
 	local possible_challenges = settings.possible_challenges
 
 	fassert(possible_challenges, "[PassiveAbilityQuestingKnight] possible_challenges not defined for the current mechanism")
@@ -90,6 +94,9 @@ end
 PassiveAbilityQuestingKnight._get_side_quest_challenge = function (self)
 	local mechanism_name = Managers.state.game_mode:game_mode_key()
 	local settings = mod.challenge_settings_adjusted[mechanism_name] or mod.challenge_settings_adjusted.default
+    if level_key == "plaza" or level_key == "dlc_celebrate_crawl" then 
+        settings = mod.challenge_settings_adjusted.default
+    end
 	local side_quest_challenge = settings.side_quest_challenge
 
 	fassert(side_quest_challenge, "[PassiveAbilityQuestingKnight] side_quest_challenge not defined for the current mechanism")
@@ -100,6 +107,9 @@ end
 PassiveAbilityQuestingKnight._always_reset_quest_pool = function (self)
 	local mechanism_name = Managers.state.game_mode:game_mode_key()
 	local settings = mod.challenge_settings_adjusted[mechanism_name] or mod.challenge_settings_adjusted.default
+    if level_key == "plaza" or level_key == "dlc_celebrate_crawl" then 
+        settings = mod.challenge_settings_adjusted.default
+    end
 
 	return settings.always_reset_quest_pool or false
 end
@@ -111,7 +121,81 @@ mod.gk_weave_event_register = function ()
     Managers.state.event:register(mod, "weave_score_percent_big_reached", "weave_score_percent_big_reached")
     -- create one big table for all gamemodes
     mod.challenge_settings_adjusted = {
-        default = {
+        default = { -- only challenges that can be achieved in every map and all gamemodes (heal regen removed)
+            possible_challenges = {
+                {
+                    reward = "markus_questing_knight_passive_power_level",
+                    type = "kill_elites",
+                    amount = {
+                        1,
+                        15,
+                        15,
+                        20,
+                        20,
+                        30,
+                        30,
+                        30
+                    }
+                },
+                {
+                    reward = "markus_questing_knight_passive_attack_speed",
+                    type = "kill_specials",
+                    amount = {
+                        1,
+                        10,
+                        10,
+                        15,
+                        15,
+                        20,
+                        20,
+                        20
+                    }
+                },
+                {
+                    reward = "markus_questing_knight_passive_cooldown_reduction",
+                    type = "kill_monsters",
+                    amount = {
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1
+                    }
+                },
+                {
+                    reward = "markus_questing_knight_passive_damage_taken",
+                    type = "kill_roamers",
+                    amount = {
+                        1,
+                        50,
+                        60,
+                        75,
+                        85,
+                        100,
+                        100,
+                        100
+                    }
+                }
+            },
+            side_quest_challenge = {
+                reward = "markus_questing_knight_passive_strength_potion",
+                type = "kill_enemies",
+                amount = {
+                    1,
+                    100,
+                    125,
+                    150,
+                    175,
+                    200,
+                    200,
+                    200
+                }
+            }
+        },
+        adventure = {
             possible_challenges = {
                 {
                     reward = "markus_questing_knight_passive_power_level",
@@ -416,7 +500,6 @@ end
 function mod.update()
     mod.weave_score_percent_big_reached()
 end
-
 
 
 

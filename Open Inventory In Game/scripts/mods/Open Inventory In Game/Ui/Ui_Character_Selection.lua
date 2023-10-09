@@ -43,7 +43,7 @@ local career_kruber = {"Mercenary", "Huntsman", "Foot Knight", "Grail Knight"}
 local career_bardin = {"Ranger Veteran", "Ironbreaker", "Slayer", "Outcast Engineer"}
 local career_kerillian = {"Waystalker", "Handmaiden", "Shade", "Sister Of The Thorn"}
 local career_saltspyre = {"Witch Hunter Captain", "Bounty Hunter", "Zealot", "Warrior Priest"}
-local career_sienna = {"Battle Wizard", "Pyromancer", "Unchained"}
+local career_sienna = {"Battle Wizard", "Pyromancer", "Unchained", "Necromancer"}
 
 
 function Ui_Open_Inventory.draw(self)
@@ -89,7 +89,7 @@ function Ui_Open_Inventory.draw(self)
   end
   if character_index == 5 then
     local last_career_index = mod.lookup_career_index
-    local career_index = Imgui.combo(" ##2", last_career_index, career_sienna, 3)
+    local career_index = Imgui.combo(" ##2", last_career_index, career_sienna, 4)
     mod.lookup_career_index = career_index
   end
 
@@ -98,7 +98,6 @@ function Ui_Open_Inventory.draw(self)
   if Imgui.small_button("> Change Hero <") then
     mod.change_hero()
     mod.close_menu()
-    --self:close()
   end
 
   Imgui.spacing()
@@ -107,7 +106,6 @@ function Ui_Open_Inventory.draw(self)
   if Imgui.small_button("- Rescue Yourself -") then
     mod.revive_self()
     mod.close_menu()
-    --self:close()
   end
 
   Imgui.end_window()

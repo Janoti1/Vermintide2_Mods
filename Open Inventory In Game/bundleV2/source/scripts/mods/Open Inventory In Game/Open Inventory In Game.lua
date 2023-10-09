@@ -57,6 +57,7 @@ function mod.update()
   if mod:get("open_character_selection_toggle") then
     -- check for if inventory is open
     if mod.Ui_Open_Inventory and mod.HeroWindowLoadoutInventory_open then
+      Imgui.open_imgui() -- idea for imgui staying open
       mod.Ui_Open_Inventory:draw()
     end
   end
@@ -197,13 +198,14 @@ mod.change_hero = function ()
     local player = Managers.player:local_player()
     local career_index = player:career_index()
     local profile_index = player:profile_index()
+    local local_player_id = 1
     if career_index == 4 and profile_index == 5 then
       local player_unique_id = player:unique_id()
       mod.player_unique_id_of_grail_knight_player = player_unique_id
       mod.grail_knight_quest_remove_value_adjustment()
     end
 
-    Managers.state.network:request_profile(1, profile_name, career_name, true)
+    Managers.state.network:request_profile(local_player_id, profile_name, career_name, true)
   else
     mod:echo("[Open Inventory In Game]: You can't change to a career you don't own.")
   end
@@ -308,6 +310,6 @@ end)
 -- DONE (probably related to something else, no way to reproduce) -- figure out if problems exist or not in terms of balance mods
 -- DONE -- Grail Knight quests reset and delete
 -- DONE -- Add necromancer to ui and figure out dlc name
--- DONW -- remove quests from gk through host if possible otherwise leave it bugged ig
+-- DONE -- remove quests from gk through host if possible otherwise leave it bugged ig
 -- let dlc check run again when mods get reloaded
 -- technically not an issue yet but if bots would change mid game gk quests would stay

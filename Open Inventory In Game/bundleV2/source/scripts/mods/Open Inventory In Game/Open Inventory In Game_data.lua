@@ -39,6 +39,12 @@ return {
 				range = {1, 1080},
 				setting_id = "window_position_y",
 				tootlip = "open_character_selection_hotkey_tooltip_y"
+			},
+			{
+				setting_id = "open_character_selection_text_free_move",
+				type = "checkbox",
+				default_value = false,
+				tooltip = "open_character_selection_hotkey_free_move"
 			}
 		}
 	}

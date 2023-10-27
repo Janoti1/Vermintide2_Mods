@@ -43,6 +43,12 @@ return {
 	},
 	open_character_selection_hotkey_tooltip_y = {
 		en = "Move the Character Selection Window up and down"
+	},
+	open_character_selection_text_free_move = {
+		en = "Move freely"
+	},
+	open_character_selection_hotkey_free_move = {
+		en = "Move the Character Selection Window Freely. Be careful dragging the window out of the game window will break it and possibly the game!"
 	}
 }
 

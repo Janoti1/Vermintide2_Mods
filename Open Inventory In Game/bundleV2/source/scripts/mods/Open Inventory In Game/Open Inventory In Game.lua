@@ -20,6 +20,14 @@ mod:command("open_inventory", mod:localize("command_description"), function()
   mod:open_inventory()
 end)
 
+-- doesnt work
+-- mod.open_weave_forge = function ()
+--   Managers.ui:handle_transition("hero_view_force", {
+--     use_fade = true,
+--     menu_state_name = "weave_forge"
+--   })
+-- end
+
 
 
 --Add functionallity to all UI versions
@@ -268,7 +276,7 @@ mod.get_owned_dlcs = function ()
     if owned_dlc_data[i] == "bless" then
       owns_career.wh_priest = true
     end
-    if owned_dlc_data[i] == "sythe" then --unknown dlc just a guess
+    if owned_dlc_data[i] == "shovel" then
       owns_career.bw_necromancer = true
     end
   end
@@ -311,5 +319,8 @@ end)
 -- DONE -- Grail Knight quests reset and delete
 -- DONE -- Add necromancer to ui and figure out dlc name
 -- DONE -- remove quests from gk through host if possible otherwise leave it bugged ig
+-- DONW -- add checkbox for freely moving the window
 -- let dlc check run again when mods get reloaded
 -- technically not an issue yet but if bots would change mid game gk quests would stay
+-- add seperate keybind for character selection window ?
+-- save window position when moved freely

@@ -48,8 +48,10 @@ local career_sienna = {"Battle Wizard", "Pyromancer", "Unchained", "Necromancer"
 
 function Ui_Open_Inventory.draw(self)
 
-  Imgui.set_next_window_size(400, 165)
-  Imgui.set_next_window_pos(mod:get("window_position_x"), mod:get("window_position_y"))
+  if not mod:get("open_character_selection_text_free_move") then
+    Imgui.set_next_window_size(400, 165)
+    Imgui.set_next_window_pos(mod:get("window_position_x"), mod:get("window_position_y"))
+  end
 
   Imgui.begin_window("Character Selection")
   Imgui.spacing()

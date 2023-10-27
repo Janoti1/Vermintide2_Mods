@@ -1,0 +1,11 @@
+mod = [
+	"Distance Calculator"
+]
+
+package = [
+	"resource_packages/Distance Calculator/Distance Calculator"
+]
+
+lua = [
+	"scripts/mods/Distance Calculator/*"
+]

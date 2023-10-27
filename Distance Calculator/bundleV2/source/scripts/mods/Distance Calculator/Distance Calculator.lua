@@ -3,7 +3,8 @@ local mod = get_mod("Distance Calculator")
 mod.locations = {}
 mod.locationcounter = 1
 
-mod:command("location_save", "save a location for calculation", function()
+
+mod.location_save = function()
     local player_unit = Managers.player:local_player().player_unit
     local position = Unit.local_position(player_unit, 0)
     local rotation = Unit.local_rotation(player_unit, 0)
@@ -11,9 +12,13 @@ mod:command("location_save", "save a location for calculation", function()
     mod:echo("Location " .. mod.locationcounter .. " saved.")
     mod.locationcounter = mod.locationcounter + 1
     --mod:echo("[\"%s\"] = { {%f, %f, %f} }", Managers.state.game_mode._level_key, position.x, position.y, position.z)
+end
+mod:command("location_save", "save a location for calculation", function()
+    location_save()
 end)
 
-mod:command("location_calulate", "get distance between locations", function()
+
+mod.location_calculate = function()
     if mod.locationcounter > 0 then
         local L = mod.locations
         distance( L[1][1], L[1][2], L[1][3], L[2][1], L[2][2], L[2][3] )
@@ -23,6 +28,9 @@ mod:command("location_calulate", "get distance between locations", function()
     else
         mod:echo("Not enough locations saved to calcate.")
     end
+end
+mod:command("location_calculate", "get distance between locations", function()
+    location_calculate()
 end)
 
 function distance( x1, y1, z1, x2, y2, z2 )

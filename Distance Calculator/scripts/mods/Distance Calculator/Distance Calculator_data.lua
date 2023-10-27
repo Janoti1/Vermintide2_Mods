@@ -22,7 +22,7 @@ return {
 				type = "keybind",
 				default_value = {},
 				keybind_type = "function_call",
-				function_name = "location_calulate",
+				function_name = "location_calculate",
 				setting_id = "calculate_location",
 				tootltip = "calculate_location_tootltip"
 			}

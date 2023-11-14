@@ -1,0 +1,14 @@
+mutator_icon_glowing_eyes = {
+	material_contexts = {
+		surface_material = ""
+	}
+
+	shader = "gui:DIFFUSE_MAP"
+
+	textures = {
+		diffuse_map = "textures/Geheimnisnacht for all/mutator_icon_glowing_eyes"
+	}
+
+	variables = {
+	}
+}

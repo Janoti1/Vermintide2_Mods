@@ -9,3 +9,11 @@ package = [
 lua = [
 	"scripts/mods/Open Inventory In Game/*"
 ]
+
+material = [
+	"materials/*"
+]
+
+texture =  [
+	"textures/*"
+]

@@ -2,10 +2,20 @@ local mod = get_mod("Open Inventory In Game")
 
 return {
 	name = "Open Inventory In Game",
-	description = "mod_description",
+	description = mod:localize("mod_description"),
 	is_togglable = true,
 	is_mutator = false,
-	mutator_settings = {},
+	custom_gui_textures = {
+		textures = {
+			"open_inventory_swap_icon"
+		},
+		ui_renderer_injections = {
+			{
+				"ingame_ui",
+				"materials/open_inventory_swap_icon"
+			}
+		}
+	},
 	options = {
 		widgets = {
 			{
@@ -18,34 +28,6 @@ return {
 				setting_id = "open_inventory_toggle",
 				tootlip = "open_inventory_hotkey_tooltip",
 			},
-			{
-				setting_id    = "open_character_selection_toggle",
-				type          = "checkbox",
-				default_value = true,
-				tootlip = "open_character_selection_hotkey_tooltip",
-			},
-			{
-				title = "open_character_selection_hotkey_text_x",
-				type = "numeric",
-				default_value = 156,
-				range = {1, 1920},
-				setting_id = "window_position_x",
-				tootlip = "open_character_selection_hotkey_tooltip_x"
-			},
-			{
-				title = "open_character_selection_hotkey_text_y",
-				type = "numeric",
-				default_value = 5,
-				range = {1, 1080},
-				setting_id = "window_position_y",
-				tootlip = "open_character_selection_hotkey_tooltip_y"
-			},
-			{
-				setting_id = "open_character_selection_text_free_move",
-				type = "checkbox",
-				default_value = false,
-				tooltip = "open_character_selection_hotkey_free_move"
-			}
 		}
 	}
 }

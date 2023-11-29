@@ -1,0 +1,14 @@
+open_inventory_swap_icon = {
+	material_contexts = {
+		surface_material = ""
+	}
+
+	shader = "gui:DIFFUSE_MAP"
+
+	textures = {
+		diffuse_map = "textures/open_inventory_swap_icon"
+	}
+
+	variables = {
+	}
+}

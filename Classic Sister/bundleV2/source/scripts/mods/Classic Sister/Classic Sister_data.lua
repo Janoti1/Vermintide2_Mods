@@ -19,6 +19,12 @@ return {
 				default_value = false
 			},
 			{
+				setting_id    = "classic_sister_enable_old_javelin",
+				type          = "checkbox",
+				tooltip       = "classic_sister_enable_old_javelin_tooltip",
+				default_value = false
+			},
+			{
 				setting_id    = "classic_sister_disable_repel_sound",
 				type          = "checkbox",
 				tooltip       = "classic_sister_disable_repel_sound_tooltip",

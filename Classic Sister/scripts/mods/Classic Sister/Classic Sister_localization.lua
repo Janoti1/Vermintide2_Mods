@@ -14,6 +14,12 @@ return {
 	classic_sister_enable_old_moonbow_tooltip = {
 		en = "Enable prenerf Moonfirebow."
 	},
+	classic_sister_enable_old_javelin = {
+		en = "Enable prenerf Javelin"
+	},
+	classic_sister_enable_old_javelin_tooltip = {
+		en = "Enable prenerf Javelin."
+	},
 	classic_sister_disable_repel_sound = {
 		en = "Disable Repel's sound effect"
 	},

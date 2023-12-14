@@ -82,7 +82,7 @@ function mod.modify_talent_buff_template(self, hero_name, buff_name, buff_data, 
 
     TalentBuffTemplates[hero_name][buff_name] = merged_buff
     BuffTemplates[buff_name] = merged_buff
-end 
+end
 
 
 function dump(o)
@@ -257,11 +257,13 @@ end
 dofile("scripts/mods/Classic Sister/talent_changes")
 dofile("scripts/mods/Classic Sister/ult_talents")
 dofile("scripts/mods/Classic Sister/moonbow")
+dofile("scripts/mods/Classic Sister/javelin")
 
 -- check settings
 function mod.apply_settings()
 	mod:check_old_radiant()
 	mod:check_old_mfb()
+    mod:check_old_javelin()
 	mod:check_repel_sound()
 end
 
@@ -277,7 +279,7 @@ local function updateValues()
 
 end
 mod.on_enabled = function (self)
-	mod:echo("Classic Sister v1.3.1 enabled")
+	mod:echo("Classic Sister v1.4.0 enabled")
 	updateValues()
 end
 

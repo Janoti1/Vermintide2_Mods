@@ -258,12 +258,14 @@ dofile("scripts/mods/Classic Sister/talent_changes")
 dofile("scripts/mods/Classic Sister/ult_talents")
 dofile("scripts/mods/Classic Sister/moonbow")
 dofile("scripts/mods/Classic Sister/javelin")
+dofile("scripts/mods/Classic Sister/dual_daggers_sword_and_dagger")
 
 -- check settings
 function mod.apply_settings()
 	mod:check_old_radiant()
 	mod:check_old_mfb()
     mod:check_old_javelin()
+    mod:check_old_dual_daggers()
 	mod:check_repel_sound()
 end
 
@@ -274,12 +276,10 @@ local function updateValues()
 	for _, buffs in pairs(TalentBuffTemplates) do
 		table.merge_recursive(BuffTemplates, buffs)
 	end
-
 	return
-
 end
 mod.on_enabled = function (self)
-	mod:echo("Classic Sister v1.4.0 enabled")
+	mod:echo("Classic Sister v1.5.0 enabled")
 	updateValues()
 end
 

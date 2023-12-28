@@ -4,11 +4,13 @@ local settings_sync_package_id = "settings_sync"
 local enable_old_radiant_setting_id = "classic_sister_enable_old_radiant"
 local enable_old_moonbow_setting_id = "classic_sister_enable_old_moonbow"
 local enable_old_javelin_setting_id = "classic_sister_enable_old_javelin"
+local enable_old_dual_daggers_setting_id = "classic_sister_enable_old_dual_daggers"
 local disable_repel_sound_setting_id = "classic_sister_disable_repel_sound"
 mod.settings = {
  	enable_old_radiant = false,
 	enable_old_moonbow = false,
 	enable_old_javelin = false,
+	enable_old_dual_daggers = false,
  	disable_repel_sound = false,
 }
 -- Change settings
@@ -22,6 +24,7 @@ local function load_mod_settings()
 	mod.settings.enable_old_radiant = mod:get(enable_old_radiant_setting_id)
 	mod.settings.enable_old_moonbow = mod:get(enable_old_moonbow_setting_id)
 	mod.settings.enable_old_javelin = mod:get(enable_old_javelin_setting_id)
+	mod.settings.enable_old_dual_daggers = mod:get(enable_old_dual_daggers_setting_id)
 	mod.settings.disable_repel_sound = mod:get(disable_repel_sound_setting_id)
 	mod.apply_settings()
 end
@@ -34,6 +37,7 @@ local function sync_mod_settings()
 		mod.settings.enable_old_radiant,
 		mod.settings.enable_old_moonbow,
 		mod.settings.enable_old_javelin,
+		mod.settings.enable_old_dual_daggers,
 		mod.settings.disable_repel_sound
 	)
 end
@@ -56,12 +60,13 @@ mod.on_user_joined = function(player)
 	end
 end
 
-mod:network_register(settings_sync_package_id, function(sender, host_enable_old_radiant, host_enable_old_moonbow, host_enable_old_javelin, host_disable_repel_sound)
+mod:network_register(settings_sync_package_id, function(sender, host_enable_old_radiant, host_enable_old_moonbow, host_enable_old_javelin, host_enable_old_dual_daggers, host_disable_repel_sound)
 	--mod:echo("Received settings from host.")
 
 	mod.settings.enable_old_radiant = host_enable_old_radiant
 	mod.settings.enable_old_moonbow = host_enable_old_moonbow
 	mod.settings.enable_old_javelin = host_enable_old_javelin
+	mod.settings.enable_old_dual_daggers = host_enable_old_dual_daggers
 	mod.settings.disable_repel_sound = host_disable_repel_sound
 
 	mod.apply_settings()

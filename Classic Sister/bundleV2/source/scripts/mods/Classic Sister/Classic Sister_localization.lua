@@ -20,6 +20,12 @@ return {
 	classic_sister_enable_old_javelin_tooltip = {
 		en = "Enable prenerf Javelin."
 	},
+	classic_sister_enable_old_dual_daggers = {
+		en = "Enable prenerf Dual Daggers"
+	},
+	classic_sister_enable_old_dual_daggers_tooltip = {
+		en = "Enable prenerf Dual Daggers."
+	},
 	classic_sister_disable_repel_sound = {
 		en = "Disable Repel's sound effect"
 	},

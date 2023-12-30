@@ -309,7 +309,7 @@ mod:modify_talent_buff_template("wood_elf", "kerillian_maidenguard_passive_stami
 })
 
 
--- Ariel's Benison (Healing is gone, DR?)
+-- Ariel's Benison (Works)
 -- Change: Now instead of healing, revived allies receive 50% DR for 15 sec. 
 -- Original: Increase Kerillian's revive speed by 50%. When Kerillian revives allies, she heals them for 20 health.
 
@@ -350,6 +350,20 @@ mod:add_talent_buff_template("wood_elf", "defense_on_revived_target_handmaiden_a
 })
 
 
+-- Remove TB Passive Perk
+-- entirely wipes Handmaidens passives
+local tourneybalance = get_mod("TourneyBalance")
+mod.tb_remove_damage_reduction_perk = function()
+    if tourneybalance then
+        PassiveAbilitySettings.we_2.buffs = nil
+        PassiveAbilitySettings.we_2.perks[3] = nil
+    end
+end
+mod.tb_remove_damage_reduction_perk()
+
+
+
+-- rewrite Hanmdaiden Passives
 -- Change Description
 PassiveAbilitySettings.we_2 = {
     description = "career_passive_desc_we_2a_2",
@@ -384,9 +398,9 @@ ActivatedAbilitySettings.we_2 = {
         ability_class = CareerAbilityWEMaidenGuard
     }
 }
+
 mod:add_text("career_passive_desc_we_2c_2", "Increase Kerillian's revive speed by 50%. When Kerillian revives allies, she grants 50% damage reduction for 15 seconds.")
 mod:add_text("career_active_desc_we_2_2", "Kerillian swiftly dashes forward, moving through enemies, which allows her to pass through enemies for 3 seconds.")
-
 
 
 
@@ -398,7 +412,6 @@ mod:add_text("career_active_desc_we_2_2", "Kerillian swiftly dashes forward, mov
 -- Change: Stagger THP
 -- Original: Melee killing blows restore temporary health based on the health of the slain enemy.
 
-local tourneybalance = get_mod("TourneyBalance")
 mod.vanguard_check = function()
     if not tourneybalance then
         mod:add_buff_template("rebaltourn_vanguard", {
@@ -485,7 +498,7 @@ mod:modify_talent("we_maidenguard", 2, 1, {
     }
 })
 mod:add_text("focused_spirit_name", "Focused Spirit")
-mod:add_text("focused_spirit_desc", "While above 50%% health Kerillian gains 10%% increased weapon damage. Stacks 3 times (at 65%% and 80%% health).")
+mod:add_text("focused_spirit_desc", "While above 50% health Kerillian gains 10% increased weapon damage. Stacks 3 times (at 65% and 80% health).")
 
 mod:add_talent_buff_template("wood_elf", "focused_spirit_update", {
     {
@@ -877,7 +890,7 @@ mod:add_talent_buff_template("wood_elf", "kerillian_maidenguard_passive_attack_s
 
 
 
--- Dance of Blades -> (Dance of Seasons) (Works)
+-- Dance of Blades -> (Dance of Seasons)
 -- Change: Holding block grants infinite dodge count. Dodging while not blocking grants 30% DR for 2 sec
 -- Original: Dodging while blocking increases dodge range by 20%. Dodging while not blocking increases Kerillian's power by 10% for 2 seconds.
 
@@ -909,7 +922,7 @@ mod:add_talent_buff_template("wood_elf", "dance_of_seasons", {
 mod:add_talent_buff_template("wood_elf", "dance_of_seasons_block", {
     {
         buff_func = "maidenguard_footwork_buff_handmaiden_adjust",
-        perk = buff_perks.infinite_dodge,
+        perks = {buff_perks.infinite_dodge},
         refresh_durations = true,
         icon = "kerillian_maidenguard_activated_ability_cooldown",
         duration = 2,
@@ -984,7 +997,7 @@ mod:modify_talent("we_maidenguard", 4, 3, {
     }
 })
 mod:add_text("wraith_pact_name", "Wraith Pact")
-mod:add_text("wraith_pact_desc", "Reduce dodge distance by 35%%. Gain 15%% Power and 20%% Damage Reduction.")
+mod:add_text("wraith_pact_desc", "Reduce dodge distance by 35%. Gain 15% Power and 20% Damage Reduction.")
 
 -- Add 15% Power
 mod:add_talent_buff_template("wood_elf", "wraith_pact_power", {
@@ -1032,7 +1045,7 @@ mod:add_talent_buff_template("wood_elf", "wraith_pact_dodge_distance_speed_buff"
 
 
 
--- Heart of Oak
+-- Heart of Oak (works)
 -- 50% DR against Area Aura
 -- Original: Increases max health by 15.0%.
 
@@ -1500,7 +1513,7 @@ mod:modify_talent("we_maidenguard", 6, 2, {
     }
 })
 mod:add_text("bladedancer_name", "Bladedancer")
-mod:add_text("bladedancer_desc", "Each enemy hit with Dash grants 20%% melee cleave power and 10%% increased healing for 15 seconds. Stacks up to 5 times.")
+mod:add_text("bladedancer_desc", "Each enemy hit with Dash grants 20% melee cleave power and 10% increased healing for 15 seconds. Stacks up to 5 times.")
 
 mod:add_talent_buff_template("wood_elf", "bladedancer_event_handmaiden_adjust", {
     {
@@ -1590,4 +1603,16 @@ NetworkLookup.buff_templates["power_from_pain_buff_handmaiden_adjust"] = index
 
 
 
-mod:echo("Handmaiden Adjust v1.0.2 enabled")
+mod:echo("Handmaiden Adjust v1.0.3 enabled")
+
+
+
+
+-- TODO
+-- DONE -- Dance of Seasons infinite Dodge is broken
+-- DONE -- Remove extre % from Wraith Pact's Description
+-- Asrai Alacrity sometimes sais 4 stacks for some reason
+-- Aura range and Bladedancer untested
+-- DONE -- TB Remove Bendy Passive
+-- TB Test if Renewal is 15 or 20 (20 in TB)
+-- 

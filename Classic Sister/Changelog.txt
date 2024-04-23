@@ -1,0 +1,49 @@
+
+-- TODO
+-- PRIO: Fix Pale Queens Choosing still consuming Ammo
+-- Client Timer for PQC
+-- Sound of Bleed ult is wierd
+-- add visuals to support bleed ult maybe? eg new poison stuff
+-- Language Patch for Russian, Japanese, Korean, Chinese, German ?
+
+
+
+Classic Sister v1.5.1:
+- Fixed a crash when hovering over ult talents (thanks for the info @MrCthulhu)
+- Fixed a crash when using some ultimate abilities
+- Fixed a crash when using Javelins on Waystalker with the Talent "Serrated Shots" (thanks for the info @Commander Peanutchocolate)
+- Fixed Javelins not bleeding on its 4th Light Attack (thanks for the info @Rimuru Tempest)
+- Fixed a few descriptions having one to many "%"
+
+Known Issues:
+- The talent "The Pale Queens Choosing" is currently not refunding ammo, only healing
+- Crash when Looking at the Moonfire Bow in the Armory Mod
+
+
+Classic Sister v1.5.0
+
+- Fixed sword and dagger beeing affected by the dual daggers change
+- Added option to revert dual daggers to their previous state 
+
+
+Classic Sister v1.4.0
+
+- Fixed an Issue where the pre-rework Moonfirebow would crash the game
+- Fixed minor Localization typos
+- Added the option to revert Javelins to their previous state
+
+
+Classic Sister v1.3.1
+
+- Fixed a Crash that could occur when a sister of the thorn bot would try to ult with the bloodrazer ult
+
+
+Classic Sister v1.3.0.
+- Changed player.player_unit to owner_unit (changed in 4.9, Tower of Treachery)
+--> Affected Talents: Surge of Malice, Artharti's Delight, Isha's Bounty, Hekarti's Cruel Bargain, Radiant Inheritance, The Pale Queen's Choosing, Morai-Heg's Doomsight
+- Changed Model Unit from Blackvenom Thicket to be the default unit (got removed from the code with 4.9, Tower of Treachery)
+
+
+Classic Sister v1.2.0
+- Fixed a crash that could occur when having Radiant Inheritance with the option "Radiant Inheritance on release" unticked
+- Added the abillity to change the Repel sound in game without having to restart (Credits to Isakk)

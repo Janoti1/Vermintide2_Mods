@@ -279,10 +279,13 @@ local function updateValues()
 	return
 end
 mod.on_enabled = function (self)
-	mod:echo("Classic Sister v1.5.0 enabled")
+	mod:echo("Classic Sister v1.5.1 enabled")
 	updateValues()
 end
 
 -- TODO
+-- PRIO: Fix Pale Queens Choosing still consuming Ammo
 -- Client Timer for PQC
 -- Sound of Bleed ult is wierd
+-- add visuals to support bleed ult maybe? eg new poison stuff
+-- Language Patch for Russian, Japanese, Korean, Chinese, German ?

@@ -122,7 +122,7 @@ ThornSisterWallExtension.despawn = function (self)
 			end
 		end
 
-		self._area_damage_extension:enable(false)
+		self._area_damage_extension:enable_area_damage(false) -- changed with 5.3.1 self._area_damage_extension:enable(false)
 	end
 
 	Unit.flow_event(self._unit, "despawn")
@@ -620,14 +620,12 @@ mod.add_explosion_template("wood_elf", "blackvenom_thicket_end_explosion",{
 	}
 })
 
--- Wall debuff (talent buff template doesnt work) using OG (same)
---[[
-mod:add_talent_buff_template("wood_elf", "kerillian_thorn_sister_blackvenom_thicket", {
-	--kerillian_thorn_sister_debuff_wall_buff
+BuffTemplates.thorn_sister_blackvenom_buff = {
 	buffs = {
 		{
+			--kerillian_thorn_sister_debuff_wall_buff
 			start_flow_event = "poisoned",
-			name = "kerillian_thorn_sister_blackvenom_thicket",
+			name = "thorn_sister_blackvenom_buff",
 			stat_buff = "damage_taken",
 			death_flow_event = "poisoned_death",
 			refresh_durations = true,
@@ -642,8 +640,14 @@ mod:add_talent_buff_template("wood_elf", "kerillian_thorn_sister_blackvenom_thic
 		}
 	}
 }
-)
-]]
+local index = #NetworkLookup.buff_templates + 1
+NetworkLookup.buff_templates[index] = "thorn_sister_blackvenom_buff"
+NetworkLookup.buff_templates["thorn_sister_blackvenom_buff"] = index
+
+local index = #NetworkLookup.dot_type_lookup + 1
+NetworkLookup.dot_type_lookup[index] = "thorn_sister_blackvenom_buff"
+NetworkLookup.dot_type_lookup["thorn_sister_blackvenom_buff"] = index
+DotTypeLookup.thorn_sister_blackvenom_buff = "poison_dot"
 
 
 -- Damage Profiles
@@ -753,7 +757,7 @@ mod:add_talent("we_thornsister", 6, 2, "bloodrazer_thicket_name", {
     buffer = "server",
 	num_ranks = 1,
 	icon = "kerillian_thornsister_explosive_wall",
-	buffs = {} 
+	buffs = {}
 })
 mod:add_text("bloodrazer_thicket_name", "Bloodrazor Thicket")
 mod:add_text("bloodrazer_thicket_desc", "Increases the Thorn Wall's eruption damage and makes it apply Bleed, but lower both size and duration.")
@@ -769,5 +773,5 @@ mod:add_talent("we_thornsister", 6, 3, "blackvenom_thicket_name", {
 	buffs = {}
 })
 mod:add_text("blackvenom_thicket_name", "Blackvenom Thicket")
-mod:add_text("blackvenom_thicket_desc", "When the Thorn Wall espires, poisonous thorns explode outwards, causing nearby enemies to take 20%% increased damage for 10 seconds.")
+mod:add_text("blackvenom_thicket_desc", "When the Thorn Wall espires, poisonous thorns explode outwards, causing nearby enemies to take 20% increased damage for 10 seconds.")
 

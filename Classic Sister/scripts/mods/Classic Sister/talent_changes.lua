@@ -2,7 +2,7 @@ local mod = get_mod("Classic Sister")
 local buff_perks = require("scripts/unit_extensions/default_player_unit/buffs/settings/buff_perk_names")
 
 
-
+-- Works 5.4.2
 -- Perk 1 A Murder of Spites instead of Blackvenom Blades
 
 PassiveAbilitySettings.we_thornsister.buffs = {
@@ -46,8 +46,8 @@ mod:add_text("career_passive_name_we_thornsister_a_OG", "A Murder of Spites")
 mod:add_text("career_passive_desc_we_thornsister_a_OG", "Kerillian deals up to 50% more damage to wounded targets depending on their remaining health. For example, she does no extra damage against full health enemies, 25% extra against enemies at half health, etc.")
 
 
-
--- Artharti's Delight Crits instead of Poison (Works)
+-- Works 5.4.2
+-- Artharti's Delight Crits instead of Poison
 
 mod:add_talent_buff_template("wood_elf", "kerillian_thorn_sister_big_bleed_classic_sister", {
     {
@@ -112,8 +112,8 @@ mod:add_text("athartis_delight_desc", "Critical Strikes make the target Bleed.")
 
 
 
-
--- Isha's Bounty instead of Briar's Malice (Works)
+-- Works 5.4.2
+-- Isha's Bounty instead of Briar's Malice
 
 BuffTemplates.kerillian_power_on_health_gain = {
     buffs = {
@@ -164,8 +164,8 @@ mod:add_text("ishas_bounty_desc", "Gaining health grants 5%% Power for 8 seconds
 
 
 
-
--- Hekarti's Cruel Bargain instead of Bonded Spirit (Works)
+-- Works 5.4.2
+-- Hekarti's Cruel Bargain instead of Bonded Spirit 
 
 BuffTemplates.kerillian_thorn_sister_reduce_passive_on_elite = {
     buffs = {
@@ -230,7 +230,7 @@ mod:add_text("hekartis_cruel_bargain_desc", "For each Elite enemy slain near Ker
 
 
 
-
+-- Works 5.4.2
 -- Radiant Inheritance (for Sister only)
 
 mod.check_old_radiant = function ()
@@ -362,7 +362,6 @@ local index = #NetworkLookup.buff_templates + 1
 NetworkLookup.buff_templates[index] = "kerillian_thorn_active_radiant_1_cs"
 NetworkLookup.buff_templates["kerillian_thorn_active_radiant_1_cs"] = index
 
-
 -- Release Radiant
 BuffTemplates.kerillian_thorn_active_old_radiant_1_cs = {
 		activation_effect = "fx/thornsister_avatar_screenspace",
@@ -440,7 +439,7 @@ NetworkLookup.buff_templates["kerillian_thorn_active_old_radiant_1_cs"] = index
 
 
 
-
+-- AMMO REFUND BUGGED WITH 5.2 or 5.3
 -- The Pale Queen's Choosing instead of Recursive Toxin
 
 mod:add_talent_buff_template("wood_elf", "kerillian_thorn_free_throw_heal_all_handler", {
@@ -510,9 +509,25 @@ mod:add_talent_buff_template("wood_elf", "kerillian_thorn_free_throw_buff", {
         buff_func = "kerillian_thorn_sister_add_buff_remove_new",
         max_stacks = 1,
         event = "on_ammo_used",
-        perk = buff_perks.infinite_ammo,
-        amount_to_heal = 3,
+        perk = {
+            buff_perks.infinite_ammo,
+        },
+        --amount_to_heal = 3,
     },
+})
+
+-- prob doesnt work
+mod:add_talent_buff_template("wood_elf", "kerilliand_thorn_free_ammo_test", {
+    {
+        event = "on_ammo_used",
+        max_stacks = 1,
+        priority_buff = true,
+        remove_on_proc = true,
+        buff_func = "dummy_function",
+        perk = {
+            buff_perks.infinite_ammo,
+        },
+    }
 })
 ProcFunctions.kerillian_thorn_sister_add_buff_remove_new = function (owner_unit, buff, params)
     --local player_unit = player.player_unit
@@ -546,10 +561,10 @@ ProcFunctions.kerillian_thorn_restore_health_on_ranged_hit = function (owner_uni
             local side = Managers.state.side.side_by_unit[owner_unit]
             local player_and_bot_units = side.PLAYER_AND_BOT_UNITS
             local amount_to_heal = buff.template.amount_to_heal
-            
+
             for i = 1, #player_and_bot_units, 1 do
                 DamageUtils.heal_network(player_and_bot_units[i], owner_unit, amount_to_heal, "career_passive")
-            end     
+            end
         end
 
         local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
@@ -566,12 +581,12 @@ mod:add_talent("we_thornsister", 5, 1, "the_pales_queen_choosing", {
     },
 })
 mod:add_text("the_pales_queen_choosing", "The Pale Queen's Choosing")
-mod:add_text("the_pales_queen_choosing_desc", "Every 8 seconds, Kerillian's next Ranged Attack consumes no resource and restores 3 permanent health.")
+mod:add_text("the_pales_queen_choosing_desc", "(ammo refund bugged) Every 8 seconds, Kerillian's next Ranged Attack consumes no resource and restores 3 permanent health.")
 
 
 
-
--- Morai-Heg's Doomsight instead of Lingering Blackvenom (Works)
+-- Works 5.4.2
+-- Morai-Heg's Doomsight instead of Lingering Blackvenom
 
 --amount to add
 mod:modify_talent_buff_template("wood_elf", "kerillian_thorn_sister_crit_on_any_ability", {
@@ -663,8 +678,8 @@ mod:add_text("moraihegs_doomsight_desc", "Gain 3 guaranteed Critical Strikes eac
 
 
 
-
--- Repel (deactivate sound effect) Credits to Isaakk for not needing to restart anymore
+-- Works 5.4.2
+-- Repel (deactivate sound effect) Credits to Isaakk for not needing to restart anymore 
 mod.check_repel_sound = function ()
 
 	if mod.settings.disable_repel_sound then

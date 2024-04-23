@@ -1,0 +1,11 @@
+mod = [
+	"Murmur Hash"
+]
+
+package = [
+	"resource_packages/Murmur Hash/Murmur Hash"
+]
+
+lua = [
+	"scripts/mods/Murmur Hash/*"
+]

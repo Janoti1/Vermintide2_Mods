@@ -1,0 +1,11 @@
+mod = [
+	"Start Map In Game"
+]
+
+package = [
+	"resource_packages/Start Map In Game/Start Map In Game"
+]
+
+lua = [
+	"scripts/mods/Start Map In Game/*"
+]

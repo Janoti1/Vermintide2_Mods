@@ -69,8 +69,15 @@ local tpLocations = {
 	["dlc_dwarf_exterior"] = { {-111.738655, -35.874016, 6.449066}, {35.397568, 223.130341, 21.670361}, {63.102043, 269.570526, 37.722443} },
 	-- Khazukan Kazakit-Ha
 	["dlc_dwarf_beacons"] = { {-141.877380, 81.960373, -25.587093}, {-76.564613, 108.855804, -23.037222}, {14.448167, 100.744186, -30.085823}, {26.456774, 1.498722, -29.470558}, {94.002838, 97.945786, 0.407797}},
+	-- A Parting of the Waves
+	["dlc_dwarf_whaling"] = {
+		{457.446899, 231.639359, 5.237631}, -- shore marker adjust
+		--{244.697998, 262.428802, 5.411333}, -- Bridge
+		{124.197914, 160.179001, 12.941144},
+		{-46.484562, 108.912117, 68.882874},
+		{26.366220, 82.894882, 68.936760}
+	}
 }
-
 
 local NDX = 0
 local TABLE_CLEARED = false
@@ -710,10 +717,21 @@ end
 
 
 
+
+-- TODO
+-- Adjust Respawn mechanics to adjust for events
+-- Add comands for practicing trails of treachery (so far I have not found a way to do this)
+
+
+
 --------------------------------
 -- Trail of Treachery Specials
 --------------------------------
 --[[
+
+Respawn checks?
+https://github.com/Aussiemon/Vermintide-2-Source-Code/blob/71af1489627732309fdc01630c458c9f0a727577/scripts/managers/game_mode/game_modes/game_mode_adventure.lua#L232
+
 --https://github.com/Aussiemon/Vermintide-2-Source-Code/blob/d838a139bbc0715041a846b290b2b09472a04297/scripts/settings/terror_events/terror_events_dlc_wizards_trail.lua
 
 mod:command("trails_middle_event_initiate", "", function()

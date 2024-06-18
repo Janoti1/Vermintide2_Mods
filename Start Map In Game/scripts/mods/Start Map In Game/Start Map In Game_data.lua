@@ -22,6 +22,9 @@ for i, map_name in ipairs( UnlockableLevelsByGameMode.adventure ) do
 	end
 end
 
+-- UnlockableLevelsByGameMode.tutorial --> prologue
+-- UnlockableLevelsByGameMode.deus --> 367 Maps?
+
 -- create dropdown for diff with global variable
 mod.difficulty_widgets = {}
 table.insert(mod.difficulty_widgets, {text = "none", value = 1})

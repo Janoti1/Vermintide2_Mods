@@ -1,5 +1,6 @@
 local mod = get_mod("Start Map In Game")
 
+-- main functionality
 mod.set_difficulty = false
 mod.get_current_level = function()
     return Managers.state.game_mode._level_key
@@ -13,6 +14,8 @@ mod.change_level_difficulty = function(difficulty)
     Managers.state.difficulty:set_difficulty(difficulty, 0) -- no tweaks
 end
 
+
+-- interaction with VMF menu and tables
 -- check the two level dropdowns and get the correct level_key from the table
 mod.on_setting_changed = function()
     if mod:get("load_selected") then
@@ -35,10 +38,6 @@ mod.on_setting_changed = function()
             return
         end
 
-        mod:echo(level_number)
-        mod:echo(tostring(#mod.map_widgets_dlc))
-        mod:echo(level)
-
         mod.load_level(level)
         mod.set_difficulty = true
 
@@ -59,8 +58,23 @@ mod.on_game_state_changed = function(status, state)
 	end
 end
 
-mod:command("dump_table", "", function()
-    mod:dump(mod.map_widgets_dlc, "dlc_level", 5)
+-- mod:command("dump_table", "", function()
+--     mod:dump(NetworkLookup.level_keys, "NetworkLookup.level_keys", 5)
+-- end)
+
+
+-- Extra Commands
+
+mod:command("load_level", "Load a level by its level_key.", function(level)
+    mod.load_level(level)
+end)
+
+mod:command("set_difficulty", "Set the difficulty of the current level.", function(difficulty)
+    mod.change_level_difficulty(difficulty)
+end)
+
+mod:command("current_level", "get the current level_key name", function()
+    mod:echo(tostring(mod.get_current_level()))
 end)
 
 
@@ -68,7 +82,7 @@ end)
 
     TODO
     - DONE categorise the dlc maps for another set of dropdowns
-    - add localisation
+    - DONE add localisation
     - remove < > from map names (optional)
     - DONE Best just all dlc things into a seperate dropdown dlc_bogenhafen, dlc_dwarf, dlc_celebrate, dlc_wizards
 

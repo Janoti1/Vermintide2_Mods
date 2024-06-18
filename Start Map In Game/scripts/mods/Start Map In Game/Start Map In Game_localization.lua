@@ -47,7 +47,15 @@ return {
 		en = "Difficulty"
 	},
 	selected_difficulty_tooltip = {
-		en = "Difficulty selection dropdown."
+		en = 	"Difficulty selection dropdown:"
+				.. "\n Recruit - normal"
+				.. "\n Veteran - hard"
+				.. "\n Champion - harder"
+				.. "\n Legend - hardest"
+				.. "\n Cataclysm - cataclysm"
+				.. "\n Cataclysm 2 - cataclysm_2"
+				.. "\n Cataclysm 3 - cataclysm_3"
+				.. "\n Versus Difficulty - versus_base"
 	},
 	load_selected = {
 		en = "Load Selected"

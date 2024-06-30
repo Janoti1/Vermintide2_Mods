@@ -1,0 +1,11 @@
+mod = [
+	"Helpers 2"
+]
+
+package = [
+	"resource_packages/Helpers 2/Helpers 2"
+]
+
+lua = [
+	"scripts/mods/Helpers 2/*"
+]

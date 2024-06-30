@@ -1,0 +1,343 @@
+local mod = get_mod("Helpers 2")
+
+
+--[[
+
+	Collection of small helper snippets for testing and QOL
+	Originally made by PropJoe, fixed by using similar snippets from other mods by
+	raindish and isaakk, expanded with snippets provided by osmium, craven and raindish
+
+	https://steamcommunity.com/sharedfiles/filedetails/?id=2418326943
+	https://steamcommunity.com/sharedfiles/filedetails/?id=1467035358
+	https://steamcommunity.com/sharedfiles/filedetails/?id=1678844573
+	https://steamcommunity.com/sharedfiles/filedetails/?id=2477335429
+	https://steamcommunity.com/sharedfiles/filedetails/?id=2940810840
+	https://steamcommunity.com/sharedfiles/filedetails/?id=2942205498
+	https://steamcommunity.com/sharedfiles/filedetails/?id=1672222699
+	https://steamcommunity.com/sharedfiles/filedetails/?id=1466489151
+
+	2024-06-13 - Janoti!
+
+]]
+
+
+--- Reset ult.
+mod.reset_ult = function()
+	local local_player_unit = Managers.player:local_player().player_unit
+	local career_extension = ScriptUnit.has_extension(local_player_unit, "career_system")
+	if career_extension then
+		career_extension:reduce_activated_ability_cooldown_percent(1, 1)
+	end
+end
+mod:command("reset_ult", mod:localize("reset_ult_command_description"), mod.reset_ult)
+
+--- Kill bots.
+mod.kill_bots = function()
+	mod:pcall(function()
+		if EAC.state() ~= "untrusted" then
+			local game_mode_manager = Managers.state.game_mode
+			local round_started = game_mode_manager:is_round_started()
+
+			if round_started then
+				mod:echo("Bots may only be killed at the start of the map.")
+				return
+			end
+		end
+
+		for _, bot in ipairs( Managers.player:bots() ) do
+			if bot.player_unit then
+				local status_ext = ScriptUnit.extension(bot.player_unit, "status_system")
+				if status_ext and not status_ext:is_ready_for_assisted_respawn() then
+					status_ext:set_dead(true)
+				end
+			end
+		end
+	end)
+end
+mod:command("kill_bots", mod:localize("kill_bots_command_description"), function() mod.kill_bots() end)
+
+--- Pause.
+mod.paused = false
+mod.do_pause = function()
+	if not Managers.player.is_server then
+		mod:echo(mod:localize("not_server"))
+		return
+	end
+
+	if mod.paused then
+		Managers.state.debug:set_time_scale(13)
+		mod.paused = false
+		mod:echo(mod:localize("game_unpaused"))
+	else
+		Managers.state.debug:set_time_scale(6)
+		mod.paused = true
+		mod:echo(mod:localize("game_paused"))
+	end
+end
+mod:command("pause", mod:localize("pause_command_description"), function() mod.do_pause() end)
+
+-- Win/Fail/Restart level
+-- taken from raindish's restart mod and integrated here
+mod.fail_level = function()
+	if DamageUtils.is_in_inn then
+		mod:echo("You can't fail in the Keep")
+	else
+		if Managers.state.game_mode then
+			Managers.state.game_mode:fail_level()
+		end
+	end
+end
+mod.win_level = function()
+	mod:pcall(function()
+        if DamageUtils.is_in_inn then
+            mod:echo("You can't win in the Keep")
+        else
+            if Managers.state.game_mode then
+                Managers.state.game_mode:complete_level()
+            end
+        end
+	end)
+end
+mod.restart_level = function()
+	mod:pcall(function()
+		if DamageUtils.is_in_inn then
+			mod:echo("You can't restart in the keep.")
+			return
+        else
+            if Managers.state.game_mode then
+                Managers.state.game_mode:retry_level()
+            end
+        end
+	end)
+end
+
+mod:command("fail", mod:localize("fail_level_command_description"), function() mod.fail_level() end)
+mod:command("win", mod:localize("win_level_command_description"), function() mod.win_level() end)
+mod:command("restart", mod:localize("restart_level_command_description"), function() mod.restart_level() end)
+
+-- Bots on / off
+mod:command("bot_toggle", mod:localize("bot_toggle_command_description"),
+function()
+	mod:pcall(function()
+		local level_settings = LevelHelper:current_level_settings()
+		level_settings.no_bots_allowed = not level_settings.no_bots_allowed
+	end)
+end)
+
+-- Invincible
+mod.invincible = false
+mod:command("invincible_toggle", mod:localize("invincible_toggle_command_description"),
+function()
+	mod:pcall(function()
+		if mod.invincible then
+			script_data.player_invincible = not script_data.player_invincible
+			mod.invincible = false
+			mod:echo("You can take damage.")
+		else
+			script_data.player_invincible = not script_data.player_invincible
+			mod.invincible = true
+			mod:echo("You are invincible.")
+		end
+	end)
+end)
+
+-- toggle damage in Keep
+mod.take_damage = false
+mod:command("inn_dmg", mod:localize("inn_damage_command_description"),
+function()
+	mod:pcall(function()
+		if mod.take_damage then
+			DamageUtils.is_in_inn = true
+			mod.take_damage = false
+			mod:echo("You are invincible in the keep.")
+		else
+			DamageUtils.is_in_inn = false
+			mod.take_damage = true
+			mod:echo("You can take damage in the keep.")
+		end
+	end)
+end)
+
+
+-- make yourself invisible
+-- provided by osmium
+local cloak_is_on = false
+mod.invisible = function()
+	local player_unit = Managers.player:local_player().player_unit
+	if cloak_is_on == false then
+		local player_unit = Managers.player:local_player().player_unit
+		ScriptUnit.has_extension(Managers.player:local_player().player_unit, "status_system"):set_invisible(true, nil, "whatever_string")
+		cloak_is_on = true
+		mod:echo("Player Invisible")
+	else
+		local player_unit = Managers.player:local_player().player_unit
+		ScriptUnit.has_extension(Managers.player:local_player().player_unit, "status_system"):set_invisible(false, nil, "whatever_string")
+		cloak_is_on = false
+		mod:echo("Player Visible")
+	end
+end
+mod:command("invisible", "Toggles invisibilty.", function()
+	mod.invisible()
+end)
+
+
+-- suicide
+-- yoinked from raindish's mod
+mod:command("die", mod:localize("die_command_description"), function()
+	if DamageUtils.is_in_inn then
+		mod:echo("You cannot die in the keep.")
+		return
+	end
+
+	local player_unit = Managers.player:local_player().player_unit
+	local death_system = Managers.state.entity:system("death_system")
+	death_system:kill_unit(player_unit, {})
+	Managers.chat:send_chat_message(1, 1, "Guess I'll die-die...", false, nil, false)
+end)
+
+
+-- infinite ammo
+-- yoinked from PropJoe's mod
+-- only toggable when freshly loaded into a map ?
+mod.infinite_ammo = false
+mod.is_in_game = false
+mod.update = function(dt = 10)
+	if mod.is_in_game then
+		if mod.infinite_ammo then
+			mod:echo("Limited ammo and overheat.")
+			mod.remove_infinite_ammo_buffs()
+			--mod.infinite_ammo = false
+		else
+			mod:echo("Unlimited ammo and overheat.")
+			mod.refresh_infinite_ammo_buffs()
+			--mod.infinite_ammo = true
+		end
+	end
+end
+mod.on_game_state_changed = function(status, state)
+	if status == "enter" and state == "StateIngame" then
+		mod.is_in_game = true
+	end
+end
+mod.refresh_infinite_ammo_buffs = function()
+	if Managers.player:local_player() then
+		local local_player_unit = Managers.player:local_player().player_unit
+		if local_player_unit and Unit.alive(local_player_unit) then
+			local buff_extension = ScriptUnit.has_extension(local_player_unit, "buff_system")
+			if buff_extension then
+				buff_extension:add_buff("twitch_no_overcharge_no_ammo_reloads")
+			end
+		end
+	end
+
+	if Managers.player.is_server then
+		local players = Managers.player:human_and_bot_players()
+
+		for _, player in pairs(players) do
+			local unit = player.player_unit
+
+			if Unit.alive(unit) then
+				local buff_extension = ScriptUnit.has_extension(unit, "buff_system")
+				if buff_extension and not buff_extension:has_buff_type("twitch_no_overcharge_no_ammo_reloads") then
+					local buff_system = Managers.state.entity:system("buff_system")
+					local server_controlled = false
+					buff_system:add_buff(unit, "twitch_no_overcharge_no_ammo_reloads", unit, server_controlled)
+				end
+			end
+		end
+	end
+end
+mod.remove_infinite_ammo_buffs = function()
+	if Managers.player:local_player() then
+		local local_player_unit = Managers.player:local_player().player_unit
+		if local_player_unit and Unit.alive(local_player_unit) then
+			local buff_extension = ScriptUnit.has_extension(local_player_unit, "buff_system")
+			if buff_extension and buff_extension:has_buff_type("twitch_no_overcharge_no_ammo_reloads") then
+				local inf_ammo_buff = buff_extension:get_non_stacking_buff("twitch_no_overcharge_no_ammo_reloads")
+				buff_extension:remove_buff(inf_ammo_buff.id)
+			end
+		end
+	end
+
+	if Managers.player.is_server then
+		local players = Managers.player:human_and_bot_players()
+
+		for _, player in pairs(players) do
+			local unit = player.player_unit
+			if Unit.alive(unit) then
+				local buff_extension = ScriptUnit.has_extension(unit, "buff_system")
+				if buff_extension and buff_extension:has_buff_type("twitch_no_overcharge_no_ammo_reloads") then
+					local inf_ammo_buff = buff_extension:get_non_stacking_buff("twitch_no_overcharge_no_ammo_reloads")
+					buff_extension:remove_buff(inf_ammo_buff.id)
+				end
+			end
+		end
+	end
+end
+
+mod:command("infinite_ammo_heat", mod:localize("infinite_ammo_heat_command_description"), function()
+	mod.infinite_ammo = not mod.infinite_ammo
+	--mod.toggle_infinite_ammo()
+end)
+
+
+
+-- unlimited Power
+
+
+
+
+
+-- Fix restart Sound Bug on command
+-- yoinked from the mod from Craven
+mod:command("fixSound", "Fix sound being bugged after restarting", function() 
+    mod.fixSound()
+end)
+mod.fixSound = function()
+    if string.find(Managers.state.game_mode._level_key, "inn_level") then
+        mod:echo("[Helpers 2]: Unable to remove sound bug in keep, must be in mission")
+        return
+    end
+    local local_player = Managers.player:local_player()
+    local player_unit = local_player.player_unit
+    local first_person_extension = ScriptUnit.has_extension(player_unit, "first_person_system")
+    first_person_extension:play_hud_sound_event("sfx_player_in_vortex_false")
+end
+
+
+-- Fixes for something
+mod:hook(VolumetricsFlowCallbacks, "unregister_fog_volume", function(func, params, ...)
+    if (Unit.alive(params.unit)) then
+        return func(params, ...)
+    end
+end)
+mod:hook(VolumetricsFlowCallbacks, "unregister_fog_volume",
+function(func, params, ...)
+	local unit = params.unit
+
+	if not unit or not Unit.alive(unit) then
+		return
+	end
+
+	return func(params, ...)
+end)
+
+mod:hook(Unit, "get_data",
+function(func, unit, ...)
+	if not unit then
+		return
+	end
+
+	return func(unit, ...)
+end)
+
+
+
+--[[ TODO
+
+- Echo for ammo toggle
+- fix infinite ammo
+- check why fail level takes so long
+- unlimited power? Table value increased or give player gazillion EP buffs?
+
+]]

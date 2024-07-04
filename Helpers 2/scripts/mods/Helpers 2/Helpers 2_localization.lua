@@ -118,7 +118,7 @@ local localization = {
 	},
 
 	CRIT_CHANCE_NUMERIC = {
-		en = "Set Base Crit Chance"
+		en = "Base Crit Chance"
 	},
 	CRIT_CHANCE_NUMERIC_description = {
 		en = 	"Sets the Base Crit Chance of the current career to the chosen value."

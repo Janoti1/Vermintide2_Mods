@@ -351,6 +351,7 @@ end)
 
 
 -- Base Crit Chance Adjustments for the Using Player
+mod.crit_chance_value = 1
 mod.get_career_name = function()
 	local player = Managers.player:local_player()
 	local profile_index = player:profile_index()
@@ -365,16 +366,18 @@ mod.crit_chance = function(crit_chance)
 	CareerSettings[career_name].attributes.base_critical_strike_chance = crit_chance
 end
 mod.on_setting_changed = function()
-	local crit_chance = mod:get(mod.SETTING_NAMES.CRIT_CHANCE_NUMERIC)
-	mod:echo("[Hacks] Set crit chance to: " .. crit_chance .. "%%")
-	crit_chance = crit_chance / 100
-	mod.crit_chance(crit_chance)
+	if mod.crit_chance_value ~= (mod:get(mod.SETTING_NAMES.CRIT_CHANCE_NUMERIC) / 100) then
+		mod.crit_chance_value = mod:get(mod.SETTING_NAMES.CRIT_CHANCE_NUMERIC)
+		mod:echo("[Hacks] Set crit chance to: " .. mod.crit_chance_value .. "%%")
+		mod.crit_chance_value = mod.crit_chance_value / 100
+		mod.crit_chance(mod.crit_chance_value)
+	end
 end
 mod.set_default_crit_chance = function()
 	local career_name = mod.get_career_name()
-	local crit_chance = CareerSettings[career_name].attributes.base_critical_strike_chance
-	crit_chance = crit_chance * 100
-	mod:set(mod.SETTING_NAMES.CRIT_CHANCE_NUMERIC, crit_chance)
+	mod.crit_chance_value = CareerSettings[career_name].attributes.base_critical_strike_chance
+	mod.crit_chance_value = mod.crit_chance_value * 100
+	mod:set(mod.SETTING_NAMES.CRIT_CHANCE_NUMERIC, mod.crit_chance_value)
 end
 -- set default crit chance value for mod settings
 -- on career changed
@@ -466,10 +469,12 @@ end)
 - DONE add restart mod failsave
 - DONE Add mod name in brakets before every echo
 - DONE rebrand
-- thumbnail
+- DONE thumbnail
 - POSTPONED scoreboard thing (win condition func?)
 - DONE Crit Chance in percent intervals?
 - DONE set the original crit chance upon changing career in
 - DONE set it automatically upon changing the settings
+- Add Inf Stam
+- Add Set Movespeed
 
 ]]

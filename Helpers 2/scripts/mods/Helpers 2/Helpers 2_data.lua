@@ -17,6 +17,8 @@ for _, setting_name in ipairs( {
 	"FAIL_LEVEL_HOTKEY",
 	"INVISIBLE_HOTKEY",
 	"CRIT_CHANCE_NUMERIC",
+	"MOVEMENT_SPEED",
+	"TIME"
 } ) do
 	mod.SETTING_NAMES[setting_name] = setting_name
 end
@@ -84,6 +86,19 @@ mod_data.options = {
 			type = "numeric",
 			default_value = 5,
 			range = {1, 100},
+		},
+		{
+			setting_id = mod.SETTING_NAMES.MOVEMENT_SPEED,
+			type = "numeric",
+			default_value = 4,
+			range = {0, 30},
+			decimals_number = 0.1
+		},
+		{
+			setting_id = mod.SETTING_NAMES.TIME,
+			type = "numeric",
+			default_value = 13,
+			range = {1, 24}, -- (time_scale_list)
 		},
 	},
 }

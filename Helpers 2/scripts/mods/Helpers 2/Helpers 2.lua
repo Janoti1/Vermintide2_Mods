@@ -5,7 +5,7 @@ local mod = get_mod("Helpers 2")
 
 	Collection of small helper snippets for testing and QOL
 	Originally made by PropJoe, fixed by using similar snippets from other mods by
-	raindish and isaakk, expanded with snippets provided by osmium, craven and raindish
+	raindish and isaakk, expanded with snippets provided by osmium, craven, raindish, Zaphio and myself
 
 	https://steamcommunity.com/sharedfiles/filedetails/?id=2418326943
 	https://steamcommunity.com/sharedfiles/filedetails/?id=1467035358
@@ -14,6 +14,8 @@ local mod = get_mod("Helpers 2")
 	https://steamcommunity.com/sharedfiles/filedetails/?id=2940810840
 	https://steamcommunity.com/sharedfiles/filedetails/?id=1672222699
 	https://steamcommunity.com/sharedfiles/filedetails/?id=1466489151
+	https://gist.verminti.de/#!/infinite_stamina.lua
+	https://gist.verminti.de/#!/change_movement.lua
 
 	2024-06-30 - Janoti!
 
@@ -228,6 +230,10 @@ mod.update = function(dt)
 	if DamageUtils.is_in_inn and not mod.actually_in_game then
 		mod.check_spawn_tweaks()
 		mod.actually_in_game = true
+		-- reset players settings for movement speed
+		mod:set(mod.SETTING_NAMES.MOVEMENT_SPEED, PlayerUnitMovementSettings.move_speed)
+		-- set the time of the game
+		mod:set(mod.SETTING_NAMES.TIME, 13)
 	end
 
 	time = time + dt
@@ -304,6 +310,7 @@ mod.remove_infinite_ammo_buffs = function()
 	end
 end
 
+
 -- remove infinite ammo buff from spawn tweaks if it exists
 mod.check_spawn_tweaks = function()
 	local spawn_tweaks = get_mod("SpawnTweaks")
@@ -317,7 +324,6 @@ mod.check_spawn_tweaks = function()
 	mod:echo("[Hacks] SpawnTweaks detected, overriding infinite ammo function.")
 
 end
-
 mod:command("infinite_ammo_heat", mod:localize("infinite_ammo_heat_command_description"), function()
 	if mod.is_in_game then
 		mod.infinite_ammo = not mod.infinite_ammo
@@ -351,7 +357,7 @@ end)
 
 
 -- Base Crit Chance Adjustments for the Using Player
-mod.crit_chance_value = 1
+mod.crit_chance_value = 5 -- default is 5 for most careers (exception shade and whc)
 mod.get_career_name = function()
 	local player = Managers.player:local_player()
 	local profile_index = player:profile_index()
@@ -366,12 +372,19 @@ mod.crit_chance = function(crit_chance)
 	CareerSettings[career_name].attributes.base_critical_strike_chance = crit_chance
 end
 mod.on_setting_changed = function()
+	-- for crit chance
 	if mod.crit_chance_value ~= (mod:get(mod.SETTING_NAMES.CRIT_CHANCE_NUMERIC) / 100) then
 		mod.crit_chance_value = mod:get(mod.SETTING_NAMES.CRIT_CHANCE_NUMERIC)
 		mod:echo("[Hacks] Set crit chance to: " .. mod.crit_chance_value .. "%%")
 		mod.crit_chance_value = mod.crit_chance_value / 100
 		mod.crit_chance(mod.crit_chance_value)
 	end
+
+	-- for movement speed
+	mod.movement_speed()
+
+	-- for time
+	mod.time()
 end
 mod.set_default_crit_chance = function()
 	local career_name = mod.get_career_name()
@@ -390,6 +403,56 @@ mod:hook_safe(GameModeInn, "_cb_start_menu_closed", function()
 end)
 
 
+-- infinite stamina
+mod.infinite_stamina_function_backup = GenericStatusExtension.add_fatigue_points
+mod.infinite_stamina_toggle = false
+mod.infinite_stamina = function()
+	if mod.infinite_stamina_toggle then
+		mod:hook_disable(GenericStatusExtension, "add_fatigue_points", function() end)
+		mod:echo("[Hacks] Infinite stamina disabled.")
+		mod.infinite_stamina_toggle = false
+	else
+		mod:hook_origin(GenericStatusExtension, "add_fatigue_points", function() end)
+		mod:hook_enable(GenericStatusExtension, "add_fatigue_points", function() end)
+		mod:echo("[Hacks] Infinite stamina enabled.")
+		mod.infinite_stamina_toggle = true
+	end
+end
+mod:command("infinite_stamina", mod:localize("infinite_stamina_command_description"), function()
+	mod.infinite_stamina()
+end)
+
+
+-- movement speed
+mod.movement_speed_value = 4 -- default is 4
+mod.movement_speed = function()
+	if mod.movement_speed_value ~= mod:get(mod.SETTING_NAMES.MOVEMENT_SPEED) then
+		mod.movement_speed_value = mod:get(mod.SETTING_NAMES.MOVEMENT_SPEED)
+		PlayerUnitMovementSettings.move_speed = mod.movement_speed_value
+
+		local _, units_player_movement_setting = debug.getupvalue(PlayerUnitMovementSettings.unregister_unit, 1)
+		if not units_player_movement_setting then return end
+		for _, settings in pairs(units_player_movement_setting) do
+			settings.move_speed = mod.movement_speed_value
+		end
+		mod:echo("[Hacks] Movement speed set to: " .. mod.movement_speed_value)
+	end
+end
+
+
+-- time scale
+-- time values are based on this list;
+-- https://github.com/Aussiemon/Vermintide-2-Source-Code/blob/dafc183b5b4c6f4940b055b6365a8436d9e43552/scripts/managers/debug/debug_manager.lua#L18
+mod.time_scale_value = 13
+mod.time = function()
+	if mod.time_scale_value ~= mod:get(mod.SETTING_NAMES.TIME) then
+		mod.time_scale_value = mod:get(mod.SETTING_NAMES.TIME)
+		Managers.state.debug:set_time_scale(mod.time_scale_value)
+		mod:echo("[Hacks] Time set to: " .. GLOBAL_TIME_SCALE)
+	end
+end
+
+
 -- Force Respawn Dead Players
 --[[
 mod:command("respawn_dead", mod:localize("force_respawn_dead_players_command_description"), function()
@@ -401,10 +464,9 @@ mod:command("respawn_dead", mod:localize("force_respawn_dead_players_command_des
 end)
 ]]
 
-
 -- Fix restart Sound Bug on command
 -- yoinked from the mod from Craven
-mod:command("fixSound", "Fix sound being bugged after restarting", function() 
+mod:command("fixSound", mod:localize("fix_sound_command_description"), function() 
     mod.fixSound()
 end)
 mod.fixSound = function()
@@ -474,7 +536,9 @@ end)
 - DONE Crit Chance in percent intervals?
 - DONE set the original crit chance upon changing career in
 - DONE set it automatically upon changing the settings
-- Add Inf Stam
-- Add Set Movespeed
+- DONE Add Inf Stam
+- DONE Add Set Movespeed
+- DONE Add custom time scale?
+- no reloading ammo ? https://github.com/ronvoluted/darktide-mods/blob/48daad31913115fd4ed6c5a5643c40f8b30db70b/WillOfTheEmperor/scripts/mods/WillOfTheEmperor/modules/bestowments.lua#L165
 
 ]]

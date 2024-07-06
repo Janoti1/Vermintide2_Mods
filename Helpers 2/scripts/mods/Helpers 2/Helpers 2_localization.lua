@@ -14,6 +14,7 @@ local localization = {
 				.. "\n /invisible to toggle invisibility."
 				.. "\n /die to kill yourself."
 				.. "\n /infinite_ammo_heat to get infinite ammo and over heat."
+				.. "\n /infinite_stamina to get infinite stamina."
 				.. "\n /giga_power to make Enhanced Power a lot stronger (one shot everything)."
 	},
 
@@ -122,8 +123,34 @@ local localization = {
 	},
 	CRIT_CHANCE_NUMERIC_description = {
 		en = 	"Sets the Base Crit Chance of the current career to the chosen value."
-				.. "\nBe aware that this will get restart upon restarting the game."
-	}
+				.. "\nBe aware that this will get reset upon restarting the game."
+	},
+
+	infinite_stamina_command_description = {
+		en = "Get unlimited stamina."
+	},
+
+	fix_sound_command_description = {
+		en = "Fix sound being bugged after restarting"
+	},
+
+	MOVEMENT_SPEED = {
+		en = "Movement Speed"
+	},
+	MOVEMENT_SPEED_description = {
+		en = 	"Set your movement speed. Default is 4."
+				.. "\nBe aware that this will get reset upon restarting the game."
+	},
+
+	TIME = {
+		en = "Time"
+	},
+	TIME_description = {
+		en = 	"Set the game time to have slow motion or speed it up. Default is 13."
+				.. "\nThe number resembles a specified time interval from a list in the code."
+				.. "\nThe lower the slower."
+				.. "\nBe aware that this will get reset upon restarting the game."
+	},
 
 	--[[
 	force_respawn_dead_players_command_description = {

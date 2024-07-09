@@ -1,0 +1,122 @@
+local mod = get_mod("Start Map In Game")
+
+-- create drop downs for maps, by splitting them by dlc or not
+mod.map_widgets = {}
+mod.map_widgets_dlc = {}
+table.insert(mod.map_widgets, {text = "none", value = 1})
+table.insert(mod.map_widgets_dlc, {text = "none", value = 1})
+
+local map = 1
+local map_dlc = 1
+for i, map_name in ipairs( UnlockableLevelsByGameMode.adventure ) do
+	if string.sub(map_name, 1, 3) == "dlc" then
+		map_dlc = map_dlc + 1
+		table.insert(mod.map_widgets_dlc, {
+			text = map_name, value = map_dlc,
+		})
+	else
+		map = map + 1
+		table.insert(mod.map_widgets, {
+			text = map_name, value = map,
+		})
+	end
+end
+
+
+-- create dropdown for diff with global variable
+mod.difficulty_widgets = {}
+table.insert(mod.difficulty_widgets, {text = "none", value = 1})
+for i, difficulty_name in ipairs( Difficulties ) do
+	table.insert(mod.difficulty_widgets, {
+		text = difficulty_name, value = i+1,
+	})
+end
+
+mod.localization = {}
+mod.localization = {
+	mod_description = {
+		en = "Start a campaign map with a selectable difficulty from anywhere."
+	},
+	selected_level = {
+		en = "Level"
+	},
+	selected_level_tooltip = {
+		en = "Base game level selection dropdown."
+	},
+	selected_dlc_level = {
+		en = "DLC Level"
+	},
+	selected_dlc_level_tooltip = {
+		en = "DLC level selection dropdown."
+	},
+	selected_difficulty = {
+		en = "Difficulty"
+	},
+	selected_difficulty_tooltip = {
+		en = "Difficulty selection dropdown."
+	},
+	load_selected = {
+		en = "Load Selected"
+	},
+	load_selected_tooltip = {
+		en = "Load the selected map with the selected difficulty."
+	}
+}
+
+
+local game_localize = Managers.localizer
+-- Difficulty Names Table
+mod.difficulty_mapping = {
+	normal = "Recruit",
+	hard = "Veteran",
+	harder = "Champion",
+	hardest = "Legend",
+	cataclysm = "Cataclysm",
+	cataclysm_2 = "Cataclysm 2",
+	cataclysm_3 = "Cataclysm 3",
+	versus_base = "versus_base",
+}
+-- add unlocalized strings to loca table as table entries
+-- for i = 2, #mod.difficulty_widgets, 1 do
+-- 	local key = mod.difficulty_widgets[i].text
+-- 	mod.localization[key] = {}
+-- end
+-- for i = 2, #mod.map_widgets, 1 do
+-- 	local key = mod.map_widgets[i].text
+-- 	mod.localization[key] = {}
+-- end
+-- for i = 2, #mod.map_widgets_dlc, 1 do
+-- 	local key = mod.map_widgets_dlc[i].text
+-- 	mod.localization[key] = {}
+-- end
+
+
+-- adding localized strings to en 
+for key, value in pairs(mod.difficulty_widgets) do
+
+	mod.echo(tostring(key)
+
+	key = key.text
+	local localized_text = mod.difficulty_mapping[key]
+	mod.localization[key] = {}
+	mod.localization[key].en = localized_text
+
+
+	-- local key = mod.localization[i]
+
+	-- mod:echo(mod.localization[i])
+
+	-- if mod.difficulty_widgets[key] then
+	-- 	mod.localization[i].en = mod.difficulty_mapping[key]
+	-- end
+	
+	-- if mod.map_widgets[key] or mod.map_widgets_dlc[key] then
+	-- 	local display_name_reference = LevelSettings[key].display_name
+	-- 	mod.localization[i].en = game_localize:_base_lookup(display_name_reference)
+	-- end
+
+end
+
+
+
+return mod.localization

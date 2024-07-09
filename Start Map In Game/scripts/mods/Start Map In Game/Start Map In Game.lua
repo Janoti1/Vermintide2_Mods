@@ -28,10 +28,12 @@ mod.on_setting_changed = function()
             return
         elseif mod:get("selected_level") > 1 and mod:get("selected_dlc_level") == 1 then
             level_number = mod:get("selected_level")
-            level = string.sub(mod.map_widgets[level_number].text, 2, -2)
+            level = mod.map_widgets[level_number].text
+            mod:set("load_selected", false)
         elseif mod:get("selected_dlc_level") > 1 and mod:get("selected_level") == 1 then
             level_number = mod:get("selected_dlc_level")
-            level = string.sub(mod.map_widgets_dlc[level_number].text, 2, -2)
+            level = mod.map_widgets_dlc[level_number].text
+            mod:set("load_selected", false)
         else
             mod:echo("[SMIG] No map selected.")
             mod:set("load_selected", false)
@@ -47,24 +49,34 @@ end
 -- set the difficulty once loaded into the level,
 -- if the level was loaded via the mod
 mod.on_game_state_changed = function(status, state)
+    -- set Load Selected to false always, so when the player crashes and loads back in it's not ticked
+    if status == "enter" and state == "StateIngame" then
+        mod:set("load_selected", false)
+    end
 	if status == "enter" and state == "StateIngame" and mod.set_difficulty then
+
+        -- if no diff is selected select Cataclysm instead
         if mod:get("selected_difficulty") == 1 then
             mod:set("selected_difficulty", 6)
         end
-        local difficulty = Difficulties[mod:get("selected_difficulty") - 1] -- slot 1 is none here but normal in global
-		mod.change_level_difficulty(difficulty)
+        
+        local difficulty = mod.difficulty_widgets[mod:get("selected_difficulty")].text
+        mod.change_level_difficulty(difficulty)
         mod.set_difficulty = false
-        mod:set("load_selected", false)
 	end
 end
 
--- mod:command("dump_table", "", function()
---     mod:dump(NetworkLookup.level_keys, "NetworkLookup.level_keys", 5)
--- end)
-
+--[[
+mod:hook(Presence, "set_presence", function(func, key, value)
+    if key == "versus_base" then
+      func(key, "versus_base")
+    else
+      func(key, value)
+    end
+end)
+]]
 
 -- Extra Commands
-
 mod:command("load_level", "Load a level by its level_key.", function(level)
     mod.load_level(level)
 end)
@@ -78,6 +90,7 @@ mod:command("current_level", "get the current level_key name", function()
 end)
 
 
+
 --[[
 
     TODO
@@ -85,5 +98,8 @@ end)
     - DONE add localisation
     - remove < > from map names (optional)
     - DONE Best just all dlc things into a seperate dropdown dlc_bogenhafen, dlc_dwarf, dlc_celebrate, dlc_wizards
+
+    -- UnlockableLevelsByGameMode.tutorial --> prologue
+    -- UnlockableLevelsByGameMode.deus --> 367 Maps?
 
 ]]

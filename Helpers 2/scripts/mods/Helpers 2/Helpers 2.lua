@@ -5,7 +5,7 @@ local mod = get_mod("Helpers 2")
 
 	Collection of small helper snippets for testing and QOL
 	Originally made by PropJoe, fixed by using similar snippets from other mods by
-	raindish and isaakk, expanded with snippets provided by osmium, craven, raindish, Zaphio and myself
+	raindish and isaakk, expanded with snippets provided by osmium, craven, raindish, Zaphio, ThePageMan and myself
 
 	https://steamcommunity.com/sharedfiles/filedetails/?id=2418326943
 	https://steamcommunity.com/sharedfiles/filedetails/?id=1467035358
@@ -14,10 +14,11 @@ local mod = get_mod("Helpers 2")
 	https://steamcommunity.com/sharedfiles/filedetails/?id=2940810840
 	https://steamcommunity.com/sharedfiles/filedetails/?id=1672222699
 	https://steamcommunity.com/sharedfiles/filedetails/?id=1466489151
+	https://steamcommunity.com/sharedfiles/filedetails/?id=1408858726
 	https://gist.verminti.de/#!/infinite_stamina.lua
 	https://gist.verminti.de/#!/change_movement.lua
 
-	2024-06-30 - Janoti!
+	2024-07-14 - Janoti!
 
 ]]
 
@@ -31,6 +32,49 @@ mod.reset_ult = function()
 	end
 end
 mod:command("reset_ult", mod:localize("reset_ult_command_description"), mod.reset_ult)
+
+-- based on ThePageMan's mod No Ult Cooldown
+mod:hook_safe(CareerExtension, "update", function (self, unit, input, dt, context, t)
+
+	-- If self is a player
+	if mod:get(mod.SETTING_NAMES.ULT_PLAYER) and self.player:is_player_controlled() then
+		mod.set_reduce_ult_time(self, mod:get(mod.SETTING_NAMES.ULT_PLAYER_VALUE))
+	end
+
+	-- If self is a bot
+	if mod:get(mod.SETTING_NAMES.ULT_BOT) and not self.player:is_player_controlled() then
+		mod.set_reduce_ult_time(self, mod:get(mod.SETTING_NAMES.ULT_BOT_VALUE))
+	end
+
+end)
+mod.set_reduce_ult_time = function(self, new_value)
+	for i = 1, self._num_abilities, 1 do
+
+		local ability = self._abilities[i]
+		local charge_idx = self:_currently_decaying_cooldown(i)
+		local cooldowns = ability.cooldowns
+
+		for k = charge_idx, 1, -1 do
+			local cooldown = cooldowns[k]
+
+			if cooldown > new_value then
+				 cooldowns[k] = new_value
+			end
+
+		end
+
+		local is_ready = self:_cooldown_charge_ready(i)
+
+		if not is_ready then
+			ability.cooldown_paused = false
+		end
+	
+		if is_ready then
+			self:set_activated_ability_cooldown_unpaused(i)
+		end
+
+	end
+end
 
 
 --- Kill bots.

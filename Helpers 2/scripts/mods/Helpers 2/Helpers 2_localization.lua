@@ -18,6 +18,13 @@ local localization = {
 				.. "\n /giga_power to make Enhanced Power a lot stronger (one shot everything)."
 	},
 
+	ULT = {
+		en = "Ult"
+	},
+	ULT_description = {
+		en = "Various Ult related Options."
+	},
+
 	ULT_RESET_HOTKEY = {
 		en = "Ult Reset"
 	},
@@ -26,6 +33,34 @@ local localization = {
 	},
 	reset_ult_command_description = {
 		en = "Make ult ready."
+	},
+
+	ULT_PLAYER = {
+		en = "Player"
+	},
+	ULT_PLAYER_description = {
+		en = "Toggle player ult time adjustments."
+	},
+
+	ULT_PLAYER_VALUE = {
+		en = "Player Ult time"
+	},
+	ULT_PLAYER_VALUE_description = {
+		en = "Ult cooldown length for players in seconds."
+	},
+
+	ULT_BOT = {
+		en = "Bots"
+	},
+	ULT_BOT_description = {
+		en = "Toggle bots ult time adjustments."
+	},
+
+	ULT_BOT_VALUE = {
+		en = "Bots Ult time"
+	},
+	ULT_BOT_VALUE_description = {
+		en = "Ult cooldown length for bots in seconds."
 	},
 
 	KILL_BOTS_HOTKEY = {

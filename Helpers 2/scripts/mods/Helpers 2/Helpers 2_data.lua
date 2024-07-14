@@ -10,6 +10,11 @@ local mod_data = {
 mod.SETTING_NAMES = {}
 for _, setting_name in ipairs( {
 	"ULT_RESET_HOTKEY",
+	"ULT",
+	"ULT_PLAYER",
+	"ULT_PLAYER_VALUE",
+	"ULT_BOT",
+	"ULT_BOT_VALUE",
 	"KILL_BOTS_HOTKEY",
 	"PAUSE_HOTKEY",
 	"RESTART_LEVEL_HOTKEY",
@@ -26,12 +31,47 @@ end
 mod_data.options = {
 	widgets = {
 		{
-		  setting_id = mod.SETTING_NAMES.ULT_RESET_HOTKEY,
-		  type = "keybind",
-		  keybind_trigger = "pressed",
-		  keybind_type = "function_call",
-		  function_name = "reset_ult",
-		  default_value = {},
+			setting_id = mod.SETTING_NAMES.ULT,
+			type = "group",
+			default_value = false,
+			sub_widgets = {
+				{
+					setting_id = mod.SETTING_NAMES.ULT_RESET_HOTKEY,
+					type = "keybind",
+					keybind_trigger = "pressed",
+					keybind_type = "function_call",
+					function_name = "reset_ult",
+					default_value = {},
+				},
+				{
+					setting_id = mod.SETTING_NAMES.ULT_PLAYER,
+					type = "checkbox",
+					default_value = false,
+					sub_widgets = {
+						{
+							setting_id = mod.SETTING_NAMES.ULT_PLAYER_VALUE,
+							type = "numeric",
+							range = {0, 120},
+							decimal_number = 1,
+							default_value = 0
+						}
+					}
+				},
+				{
+					setting_id = mod.SETTING_NAMES.ULT_BOT,
+					type = "checkbox",
+					default_value = false,
+					sub_widgets = {
+						{
+							setting_id = mod.SETTING_NAMES.ULT_BOT_VALUE,
+							type = "numeric",
+							range = {0, 120},
+							decimal_number = 1,
+							default_value = 0
+						}
+					}
+				},
+			}
 		},
 		{
 		  setting_id = mod.SETTING_NAMES.KILL_BOTS_HOTKEY,

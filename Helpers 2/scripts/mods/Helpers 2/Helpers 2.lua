@@ -497,6 +497,39 @@ mod.time = function()
 end
 
 
+-- Disable Spawns
+-- From Craven's VerminTrainer Mod
+-- Function to enable/disable various spawn-related debug parameters.
+mod.disable_pacing = false
+mod.set_pacing = function()
+	if DamageUtils.is_in_inn then
+		mod:echo("[HACKS] Can't toggle enemies in the keep.")
+		return
+	end
+
+	mod.disable_pacing = not mod.disable_pacing -- Flipping our boolean argument, since "true" here means disabled.
+	
+	-- These are a set of debug variables within the game that are usually dormant. 
+	-- By setting these to 'true', the various enemy spawning systems are told not to spawn their stuff.
+	script_data.ai_mini_patrol_disabled = mod.disable_pacing
+	script_data.ai_critter_spawning_disabled = mod.disable_pacing
+	script_data.ai_horde_spawning_disabled = mod.disable_pacing
+	script_data.ai_roaming_spawning_disabled = mod.disable_pacing
+	script_data.ai_boss_spawning_disabled = mod.disable_pacing
+	script_data.ai_rush_intervention_disabled = mod.disable_pacing
+	--script_data.ai_bots_disabled = enabled -- This one just removes the bots
+	script_data.ai_specials_spawning_disabled = mod.disable_pacing
+	script_data.ai_pacing_disabled = mod.disable_pacing
+	script_data.ai_outside_navmesh_intervention_disabled = mod.disable_pacing
+
+	mod:echo("[HACKS] Pacing Disabled: %s", mod.disable_pacing)
+end
+
+mod:command("spawns_toggle", mod:localize("spawns_toggle_command_description"), function()
+	mod.set_pacing()
+end)
+
+
 -- Force Respawn Dead Players
 --[[
 mod:command("respawn_dead", mod:localize("force_respawn_dead_players_command_description"), function()

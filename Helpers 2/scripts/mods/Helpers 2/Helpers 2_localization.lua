@@ -16,6 +16,7 @@ local localization = {
 				.. "\n /infinite_ammo_heat to get infinite ammo and over heat."
 				.. "\n /infinite_stamina to get infinite stamina."
 				.. "\n /giga_power to make Enhanced Power a lot stronger (one shot everything)."
+				.. "\n /spawns_toggle to toggle spawns and pacing."
 	},
 
 	ULT = {
@@ -185,6 +186,10 @@ local localization = {
 				.. "\nThe number resembles a specified time interval from a list in the code."
 				.. "\nThe lower the slower."
 				.. "\nBe aware that this will get reset upon restarting the game."
+	},
+
+	spawns_toggle_command_description = {
+		en = "Toggle enemy spawns and pacing."
 	},
 
 	--[[

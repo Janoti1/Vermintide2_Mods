@@ -16,7 +16,9 @@ for _, setting_name in ipairs( {
 	"ULT_BOT",
 	"ULT_BOT_VALUE",
 	"KILL_BOTS_HOTKEY",
+	"PAUSE",
 	"PAUSE_HOTKEY",
+	"PAUSE_VALUE",
 	"RESTART_LEVEL_HOTKEY",
 	"WIN_LEVEL_HOTKEY",
 	"FAIL_LEVEL_HOTKEY",
@@ -82,12 +84,25 @@ mod_data.options = {
 		  default_value = {},
 		},
 		{
-		  setting_id = mod.SETTING_NAMES.PAUSE_HOTKEY,
-		  type = "keybind",
-		  keybind_trigger = "pressed",
-		  keybind_type = "function_call",
-		  function_name = "do_pause",
-		  default_value = {},
+			setting_id = mod.SETTING_NAMES.PAUSE,
+			type = "group",
+			default_value = false,
+			sub_widgets = {
+				{
+					setting_id = mod.SETTING_NAMES.PAUSE_HOTKEY,
+					type = "keybind",
+					keybind_trigger = "pressed",
+					keybind_type = "function_call",
+					function_name = "do_pause",
+					default_value = {},
+				},
+				{
+					setting_id = mod.SETTING_NAMES.PAUSE_VALUE,
+					type = "numeric",
+					default_value = 1,
+					range = {1, 24}
+				}
+			}
 		},
 		{
 		  setting_id = mod.SETTING_NAMES.RESTART_LEVEL_HOTKEY,

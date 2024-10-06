@@ -31,7 +31,7 @@ mod.reset_ult = function()
 		career_extension:reduce_activated_ability_cooldown_percent(1, 1)
 	end
 end
-mod:command("reset_ult", mod:localize("reset_ult_command_description"), mod.reset_ult)
+mod:command("ult_reset", mod:localize("reset_ult_command_description"), mod.reset_ult)
 
 -- based on ThePageMan's mod No Ult Cooldown
 mod:hook_safe(CareerExtension, "update", function (self, unit, input, dt, context, t)
@@ -116,7 +116,7 @@ mod.do_pause = function()
 		mod.paused = false
 		mod:echo(mod:localize("game_unpaused"))
 	else
-		Managers.state.debug:set_time_scale(6)
+		Managers.state.debug:set_time_scale(mod:get(mod.SETTING_NAMES.PAUSE_VALUE))
 		mod.paused = true
 		mod:echo(mod:localize("game_paused"))
 	end
@@ -164,9 +164,10 @@ mod.activate_win_fail_restart_commands = function()
 	mod:command("win", mod:localize("win_level_command_description"), function() mod.win_level() end)
 	mod:command("restart", mod:localize("restart_level_command_description"), function() mod.restart_level() end)
 end
--- check if raindish's restart mod is active and leave commands turned off
+-- check if raindish's restart mod or RandomWords Speedrun mod is active and leave commands turned off
 mod.on_all_mods_loaded = function()
 	local restart_mod = get_mod("GoToLevel")
+	--local speedrun_mod = get_mod("srcom")
 	if restart_mod then
 		return
 	else
@@ -616,6 +617,11 @@ end)
 - DONE Add Inf Stam
 - DONE Add Set Movespeed
 - DONE Add custom time scale?
-- no reloading ammo ? https://github.com/ronvoluted/darktide-mods/blob/48daad31913115fd4ed6c5a5643c40f8b30db70b/WillOfTheEmperor/scripts/mods/WillOfTheEmperor/modules/bestowments.lua#L165
+- no reloading ammo ? https://github.com/Ogrepleb/vt2-moredakka/tree/master 
+	https://github.com/ronvoluted/darktide-mods/blob/48daad31913115fd4ed6c5a5643c40f8b30db70b/WillOfTheEmperor/scripts/mods/WillOfTheEmperor/modules/bestowments.lua#L165
+- DONE Change reset_ult to ult_reset
+- DONE Change Pause to be true Pause
+- make suicide keep also the host dead (only works for client currently)
+- Fix spam of errors when disconnecting from a game (when do they happen exactly?)
 
 ]]

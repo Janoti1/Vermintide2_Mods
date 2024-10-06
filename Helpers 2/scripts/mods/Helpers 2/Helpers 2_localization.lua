@@ -1,7 +1,7 @@
 local localization = {
 	mod_description = {
 		en = 	"Collection of small utilities:"
-				.. "\n /reset_ult to reset your ultimate."
+				.. "\n /ult_reset to reset your ultimate."
 				.. "\n /kill_bots to kill all bots."
 				.. "\n /pause to savely pause the game."
 				.. "\n /restart to restart the current level."
@@ -74,11 +74,27 @@ local localization = {
 		en = "Kill the bots."
 	},
 
+	PAUSE = {
+		en = "Pause"
+	},
+	PAUSE_description = {
+		en = "Various pause options."
+	},
 	PAUSE_HOTKEY = {
 		en = "Pause"
 	},
 	PAUSE_HOTKEY_description = {
 		en = "Hotkey to pause."
+	},
+	PAUSE_VALUE = {
+		en = "Pause Value"
+	},
+	PAUSE_VALUE_description = {
+		en = "Adjust the Slowdown of Pause:"
+			.. "\n 1 = Slowest possible"
+			.. "\n 6 = Slowest to still interact with UI"
+			.. "\n 13 = Normal Speed"
+			.. "\n >13 = Faster than Normal Speed"
 	},
 	pause_command_description = {
 		en = "Pause or unpause the game. Host only."

@@ -414,7 +414,9 @@ mod.get_career_name = function()
 end
 mod.crit_chance = function(crit_chance)
 	local career_name = mod.get_career_name()
-	CareerSettings[career_name].attributes.base_critical_strike_chance = crit_chance
+	if CareerSettings[career_name].attributes then
+		CareerSettings[career_name].attributes.base_critical_strike_chance = crit_chance
+	end
 end
 mod.on_setting_changed = function()
 	-- for crit chance
@@ -433,9 +435,11 @@ mod.on_setting_changed = function()
 end
 mod.set_default_crit_chance = function()
 	local career_name = mod.get_career_name()
-	mod.crit_chance_value = CareerSettings[career_name].attributes.base_critical_strike_chance
-	mod.crit_chance_value = mod.crit_chance_value * 100
-	mod:set(mod.SETTING_NAMES.CRIT_CHANCE_NUMERIC, mod.crit_chance_value)
+	if CareerSettings[career_name].attributes then
+		mod.crit_chance_value = CareerSettings[career_name].attributes.base_critical_strike_chance
+		mod.crit_chance_value = mod.crit_chance_value * 100
+		mod:set(mod.SETTING_NAMES.CRIT_CHANCE_NUMERIC, mod.crit_chance_value)
+	end
 end
 -- set default crit chance value for mod settings
 -- on career changed

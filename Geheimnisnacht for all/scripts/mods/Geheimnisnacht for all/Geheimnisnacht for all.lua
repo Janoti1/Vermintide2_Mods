@@ -69,7 +69,7 @@ local event_settings = {
 			}
 		}
 	},
-	catacombs = { --convocation of decay
+	catacombs = { --convocation of decay (fs coordinates)
 		ritual_locations = {
 			{
 				178.8,
@@ -89,7 +89,7 @@ local event_settings = {
 			}
 		}
 	},
-	ground_zero = { -- halescourge
+	ground_zero = { -- halescourge (fs coordinates)
 		ritual_locations = {
 			{
 				-171.5,
@@ -99,7 +99,7 @@ local event_settings = {
 			}
 		}
 	},
-	elven_ruins = { --athel yenlui
+	elven_ruins = { --athel yenlui (fs coordinates)
 		ritual_locations = {
 			{
 				37.891605,
@@ -149,7 +149,7 @@ local event_settings = {
 			}
 		}
 	},
-	farmlands = { --against the grain
+	farmlands = { --against the grain (fs coordination)
 		ritual_locations = {
 			{
 				223.965363,
@@ -344,7 +344,28 @@ local event_settings = {
 				0
 			}
 		}
-	 },
+	},
+	dlc_dwarf_whaling = { --Parting (fs coorfinates)
+		ritual_locations = {
+			{
+				85.43,
+				155.75,
+				2.68,
+				0
+			}
+		}
+	},
+	--Verminous
+	dlc_termite_1 = { --temple
+		ritual_locations = {
+			{
+				231.76,
+				51.51,
+				11.16,
+				0
+			}
+		}
+	},
 	--bonus
 	dlc_celebrate_crawl = { --a quiet drink
 		ritual_locations = {

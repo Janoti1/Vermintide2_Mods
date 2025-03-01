@@ -1,0 +1,11 @@
+mod = [
+	"ModdingCollabTest"
+]
+
+package = [
+	"resource_packages/ModdingCollabTest/ModdingCollabTest"
+]
+
+lua = [
+	"scripts/mods/ModdingCollabTest/*"
+]

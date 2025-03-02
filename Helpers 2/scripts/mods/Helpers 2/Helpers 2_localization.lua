@@ -158,6 +158,12 @@ local localization = {
 		en = "Hotkey to make yourself invisible."
 	},
 
+	SUICIDE_HOTKEY = {
+		en = "Suicide"
+	},
+	SUICIDE_HOTKEY_description = {
+		en = "Hotkey to kill yourself."
+	},
 	die_command_description = {
 		en = "Kill yourself."
 	},

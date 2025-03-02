@@ -251,7 +251,7 @@ end)
 
 -- suicide
 -- yoinked from raindish's mod
-mod:command("die", mod:localize("die_command_description"), function()
+mod.die = function()
 	if DamageUtils.is_in_inn then
 		mod:echo("[Hacks] You can't die in the keep.")
 		return
@@ -261,6 +261,9 @@ mod:command("die", mod:localize("die_command_description"), function()
 	local death_system = Managers.state.entity:system("death_system")
 	death_system:kill_unit(player_unit, {})
 	Managers.chat:send_chat_message(1, 1, "[Hacks] Guess I'll die-die...", false, nil, false)
+end
+mod:command("die", mod:localize("die_command_description"), function()
+	mod.die()
 end)
 
 
@@ -626,6 +629,8 @@ end)
 - DONE Change reset_ult to ult_reset
 - DONE Change Pause to be true Pause
 - make suicide keep also the host dead (only works for client currently)
-- Fix spam of errors when disconnecting from a game (when do they happen exactly?)
+- Fix spam of errors when disconnecting from a game (when you are client and the host closes the game with you getting returned to the keep)
+- add func to have dead players respawn next to you?
+- add func to revive yourself even when you are dead? (regain health)
 
 ]]

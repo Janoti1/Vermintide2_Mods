@@ -17,6 +17,7 @@ local localization = {
 				.. "\n /infinite_stamina to get infinite stamina."
 				.. "\n /giga_power to make Enhanced Power a lot stronger (one shot everything)."
 				.. "\n /spawns_toggle to toggle spawns and pacing."
+				.. "\n /unkillable to make yourself unkillable but still take damage."
 	},
 
 	ULT = {
@@ -190,6 +191,10 @@ local localization = {
 
 	fix_sound_command_description = {
 		en = "Fix sound being bugged after restarting"
+	},
+
+	unkillable_command_description = {
+		en = "Make yourself unkillable but still take damage."
 	},
 
 	MOVEMENT_SPEED = {

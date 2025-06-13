@@ -20,6 +20,9 @@ local mod = get_mod("Helpers 2")
 
 	2024-07-14 - Janoti!
 
+	Latest Version
+	1.3.4 - 2025-06-13
+
 ]]
 
 
@@ -537,6 +540,13 @@ mod:command("spawns_toggle", mod:localize("spawns_toggle_command_description"), 
 	mod.set_pacing()
 end)
 
+-- Take Damage but dont die
+-- Cudo's to Aledend
+mod:command("unkillable", mod:localize("unkillable_command_description"), function()
+	script_data = script_data or {} --global variable in game
+	script_data.player_unkillable = not script_data.player_unkillable
+end)
+
 
 -- Force Respawn Dead Players
 --[[
@@ -606,7 +616,6 @@ end)
 
 
 --[[ TODO
-
 - DONE Echo for ammo toggle
 - DONE fix infinite ammo
 - check why fail level takes so long

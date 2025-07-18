@@ -196,6 +196,12 @@ local localization = {
 	unkillable_command_description = {
 		en = "Make yourself unkillable but still take damage."
 	},
+	unkillable_true_chat_response = {
+		en = "[Hacks] Player unkillable."
+	},
+	unkillable_false_chat_response = {
+		en = "[Hacks] Player killable."
+	},
 
 	MOVEMENT_SPEED = {
 		en = "Movement Speed"

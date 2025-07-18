@@ -545,6 +545,13 @@ end)
 mod:command("unkillable", mod:localize("unkillable_command_description"), function()
 	script_data = script_data or {} --global variable in game
 	script_data.player_unkillable = not script_data.player_unkillable
+
+	if script_data.player_unkillable then
+		mod:echo(mod:localize("unkillable_true_chat_response"))
+	else
+		mod:echo(mod:localize("unkillable_false_chat_response"))
+	end
+
 end)
 
 
@@ -641,5 +648,6 @@ end)
 - Fix spam of errors when disconnecting from a game (when you are client and the host closes the game with you getting returned to the keep)
 - add func to have dead players respawn next to you?
 - add func to revive yourself even when you are dead? (regain health)
+- add response in chat when activating and disabling unkillable
 
 ]]

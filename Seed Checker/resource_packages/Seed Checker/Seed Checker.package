@@ -1,0 +1,11 @@
+mod = [
+	"Seed Checker"
+]
+
+package = [
+	"resource_packages/Seed Checker/Seed Checker"
+]
+
+lua = [
+	"scripts/mods/Seed Checker/*"
+]

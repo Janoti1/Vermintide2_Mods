@@ -141,8 +141,8 @@ mod:hook(PickupSystem, "set_seed", function(func, self, _seed)
         self._seed = custom_item_seed
 	    self._starting_seed = custom_item_seed
     else
-        _seed = mod.generate_rng_seed() --this randomizes the item seed whilst the level seed stays custom
-        mod.temp_seed_save = _seed
+        --_seed = mod.generate_rng_seed() --this randomizes the item seed whilst the level seed stays custom
+        --mod.temp_seed_save = _seed
         func(self, _seed)
     end
 end)

@@ -1,0 +1,26 @@
+texture_test_atlas = {
+	material_contexts = {
+		surface_material = ""
+	}
+
+	shader = "gui:DIFFUSE_MAP"
+
+	textures = {
+		diffuse_map = "textures/texture_test/texture_test_atlas"
+	}
+
+	variables = {
+	}
+}
+
+texture_test_atlas_masked = {
+	material_contexts = {
+		surface_material = ""
+	}
+	shader = "gui_gradient:DIFFUSE_MAP:MASKED"
+	textures = {
+		diffuse_map = "textures/texture_test/texture_test_atlas"
+	}
+	variables = {
+	}
+}

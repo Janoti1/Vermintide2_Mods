@@ -1,0 +1,11 @@
+mod = [
+	"texture_test"
+]
+
+package = [
+	"resource_packages/texture_test/texture_test"
+]
+
+lua = [
+	"scripts/mods/texture_test/*"
+]

@@ -26,7 +26,10 @@ for _, setting_name in ipairs( {
 	"INVISIBLE_HOTKEY",
 	"CRIT_CHANCE_NUMERIC",
 	"MOVEMENT_SPEED",
-	"TIME"
+	"TIME",
+	"TIME_VALUE",
+	"TIME_FASTER",
+	"TIME_SLOWER"
 } ) do
 	mod.SETTING_NAMES[setting_name] = setting_name
 end
@@ -160,10 +163,33 @@ mod_data.options = {
 		},
 		{
 			setting_id = mod.SETTING_NAMES.TIME,
-			type = "numeric",
-			default_value = 13,
-			range = {1, 24}, -- (time_scale_list)
-		},
+			type = "group",
+			default_value = false,
+			sub_widgets = {
+				{
+					setting_id = mod.SETTING_NAMES.TIME_VALUE,
+					type = "numeric",
+					default_value = 13,
+					range = {1, 24}, -- (time_scale_list)
+				},
+				{
+					setting_id = mod.SETTING_NAMES.TIME_FASTER,
+					type = "keybind",
+					keybind_trigger = "pressed",
+					keybind_type = "function_call",
+					default_value = {},
+					function_name = "time_press_faster"
+				},
+				{
+					setting_id = mod.SETTING_NAMES.TIME_SLOWER,
+					type = "keybind",
+					keybind_trigger = "pressed",
+					keybind_type = "function_call",
+					default_value = {},
+					function_name = "time_press_slower"
+				},
+			}
+		}
 	},
 }
 

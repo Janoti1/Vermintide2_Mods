@@ -428,7 +428,7 @@ mod.on_setting_changed = function()
 	-- for crit chance
 	if mod.crit_chance_value ~= (mod:get(mod.SETTING_NAMES.CRIT_CHANCE_NUMERIC) / 100) then
 		mod.crit_chance_value = mod:get(mod.SETTING_NAMES.CRIT_CHANCE_NUMERIC)
-		mod:echo("[Hacks] Set crit chance to: " .. mod.crit_chance_value .. "%%")
+		--mod:echo("[Hacks] Set crit chance to: " .. mod.crit_chance_value .. "%%")
 		mod.crit_chance_value = mod.crit_chance_value / 100
 		mod.crit_chance(mod.crit_chance_value)
 	end
@@ -506,7 +506,24 @@ mod.time = function()
 		mod:echo("[Hacks] Time set to: " .. GLOBAL_TIME_SCALE)
 	end
 end
-
+mod.time_press_faster = function ()
+	local current_time = mod:get(mod.SETTING_NAMES.TIME)
+	if current_time == 24 then
+		mod:echo("[Hacks] Can not go faster than maximum speed.")
+		return
+	end
+	mod:set(mod.SETTING_NAMES.TIME, current_time + 1)
+	mod.time()
+end
+mod.time_press_slower = function ()
+	local current_time = mod:get(mod.SETTING_NAMES.TIME)
+	if current_time == 1 then
+		mod:echo("[Hacks] Can not go slower than minimum speed.")
+		return
+	end
+	mod:set(mod.SETTING_NAMES.TIME, current_time - 1)
+	mod.time()
+end
 
 -- Disable Spawns
 -- From Craven's VerminTrainer Mod

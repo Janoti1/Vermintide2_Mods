@@ -215,11 +215,31 @@ local localization = {
 		en = "Time"
 	},
 	TIME_description = {
-		en = 	"Set the game time to have slow motion or speed it up. Default is 13."
+		en = 	"Game time settings."
+	},
+	TIME_VALUE = {
+		en = "Time"
+	},
+	TIME_VALUE_description = {
+		en = "Set the game time to have slow motion or speed it up. Default is 13."
 				.. "\nThe number resembles a specified time interval from a list in the code."
 				.. "\nThe lower the slower."
 				.. "\nBe aware that this will get reset upon restarting the game."
 	},
+	TIME_FASTER = {
+		en = "Faster"
+	},
+	TIME_FASTER_description = {
+		en = "Increases the game time by 1 interval each button press."
+	},
+	TIME_SLOWER = {
+		en = "Slower"
+	},
+	TIME_SLOWER_description = {
+		en = "Decreases the game time by 1 interval each button press."
+	},
+
+
 
 	spawns_toggle_command_description = {
 		en = "Toggle enemy spawns and pacing."

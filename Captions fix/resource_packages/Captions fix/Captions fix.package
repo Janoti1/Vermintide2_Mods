@@ -1,0 +1,11 @@
+mod = [
+	"Captions fix"
+]
+
+package = [
+	"resource_packages/Captions fix/Captions fix"
+]
+
+lua = [
+	"scripts/mods/Captions fix/*"
+]

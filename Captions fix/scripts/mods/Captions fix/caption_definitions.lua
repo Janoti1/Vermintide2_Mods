@@ -162,8 +162,6 @@ add_caption{ label = mod:localize("packmaster_clattering"),
 -- {{{2 Standard bearers.
 add_caption{ label = mod:localize("beastmen_chanting"),
     "Play_enemy_beastmen_standar_chanting_loop",
-}
-add_caption{ label = mod:localize("beastmen_standard_planted"),
     "Stop_enemy_beastmen_standar_chanting_loop",
 }
 
@@ -189,10 +187,10 @@ add_caption{ label = mod:localize("bulwark_clanking"), duration = 1,
 }
 
 -- {{{2 Marauders.
-add_caption{ label = mod:localize("marauder_rampaging"),
-    "Play_enemy_marauder_foley_light",
-    "Play_enemy_marauder_foley_medium",
-}
+-- add_caption{ label = mod:localize("marauder_rampaging"), -- also plays for Mauler / Savage / Fanatic
+--     "Play_enemy_marauder_foley_light",
+--     "Play_enemy_marauder_foley_medium",
+-- }
 add_caption{ label = mod:localize("monk_rampaging"),
     "Play_enemy_plague_monk_start_frenzy",
 }
@@ -279,10 +277,23 @@ add_caption{ label = mod:localize("troll_puke"),
     "Play_enemy_troll_vce_puke",
 }
 
+-- {{{ Geheimnisnacht Event
+add_caption{ label = mod:localize("geheimnisnacht_event"),
+    "halloween_event_ritual_chains_small",
+    "nurgling_footstep",
+}
+add_caption{ label = mod:localize("geheimnisnacht_event_broken"),
+    "event_geheimnisnacht_ritual_shrine_destroyed",
+    "Play_event_stinger_geheimnisnacht_ritual_broken",
+}
+
 
 -- {{{2 Misc.
 add_caption{ label = mod:localize("loot_rat_muttering"),
     "Play_loot_rat_near_sound",
+}
+add_caption{ label = mod:localize("bombrat_scream"),
+    "Play_mutator_bombrat_scream",
 }
 add_caption{ label = mod:localize("grenade_lit"),
     "player_combat_weapon_grenade_light",
@@ -294,7 +305,6 @@ add_caption{ label = mod:localize("player_disabled"),
     "enemy_gutter_runner_pounced_stinger",
     "enemy_pack_master_grabbed_stinger",
 }
-
 -- {{{2 Flavour.
 --add_caption{ label = "Distant thunder",
 --    "Play_ambience_inn_boom_distant",

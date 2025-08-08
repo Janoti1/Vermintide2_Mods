@@ -251,7 +251,6 @@ local function barrel_fuse_ticking(unit, dt, context, t, data)
     end
     local data = caption_data.__barrel_fuse_dummy_event
     if data.enabled then
-        mod:echo("Barrel Fuse called: " .. tostring(data.label) .. ".")
         return trigger_event(data, Unit.world_position(unit, 0))
     end
 end
@@ -471,9 +470,19 @@ end)
     - DONE - removed tooltips obscuring the checkboxes when going through settings
     - DONE - Fix Other languages other than german and english not working / breaking the mod
     - Maybe have other folk double check the translations?
-    - Only have the debug menu be accessible in modded (in case someone is interested in sanctioning)
+    - DONE - Only have the debug menu be accessible in modded (in case someone is interested in sanctioning)
     - DONE - Korean Loca?
     - DONE - Brazilian Loca?
+
+    - DONE - Check on Russian loca
+    - DONE - Ratling reloading caption adjust
+    - DONE - Remove Marauder rampaging sfx (applies to various enemies not just marauders)
+    - DONE - add ritual sfx
+    - DONE - bomb rat sfx
+    - fix horde approaching not working
+    - fix backstab not working
+    - DONE - check beastmen chanting? (putting down doesnt work anymore)
+    - DONE - barrel crackling caption fix
 
     NOTES
     ["da-dk"] = "da",
